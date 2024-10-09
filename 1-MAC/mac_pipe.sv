@@ -34,7 +34,7 @@ module mac_pipe #(
 		//Complete the saturation detection here.
 		//If the signs of the two input match, we may have overflowed. 
 		//Further check if the sign has flipped in the sum. If the sign has flipped, then we have overflowed.
-		if ((out[OUTW-1] == add1[OUTW-1]) && (sum[OUTW-1] != out[OUTW-1])) begin
+		if ((out[OUTW-1] == add1[2*INW-1-1]) && (sum[OUTW-1] != out[OUTW-1])) begin
 			//Check which way we have overflowed
 			if (sum[OUTW-1] == 1) sum = MAXVAL;
 			else sum = MINVAL;
