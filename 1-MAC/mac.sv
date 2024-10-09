@@ -22,18 +22,15 @@ module mac #(
 	//Add register sum and product
 	always_comb begin
 		
-		//Saturation detection
-		//If sum of two positives get a negative
-		if ((product > 0) && (out > 0) && ((out + product) < 0)) begin
-			sum = MAXVAL;
-		end
-		//If sum of two negatives get a positive
-		else if((product < 0) && (out < 0) && ((out + product) > 0)) begin
-			sum = MINVAL;
-		end
-		//If addition goes well
-		else begin
-			sum = product + out;
+		sum = out + product;
+
+		//Complete the saturation detection here.
+		//If the signs of the two input match, we may have overflowed. 
+		//Further check if the sign has flipped in the sum. If the sign has flipped, then we have overflowed.
+		if ((out[OUTW-1] == product[OUTW-1]) && (sum[OUTW-1] != out[OUTW-1])) begin
+			//Check which way we have overflowed
+			if (sum[OUTW-1] == 1) sum = MAXVAL;
+			else sum = MINVAL;
 		end
 	end
 
