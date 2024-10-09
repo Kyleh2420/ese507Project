@@ -11,7 +11,6 @@ module mac #(
 	
 	logic [2*INW-1:0] product;		
 	logic [OUTW-1:0] sum;
-	logic [OUTW-1:0] feedback;
 
 	//Multiply two values
 	always_comb begin
@@ -20,53 +19,35 @@ module mac #(
 		
 	end
 
-	//Add register feedback and product
+	//Add register sum and product
 	always_comb begin
 		
 		//Saturation detection
 		//If sum of two positives get a negative
-		if ((in1 > 0) && (in0 > 0) && ((in0 + in1) < 0)) begin
-
+		if ((product > 0) && (out > 0) && ((out + product) < 0)) begin
 			sum = MAXVAL;
-
 		end
 		//If sum of two negatives get a positive
-		else if((in1 < 0) && (in0 < 0) && ((in0 + in1) > 0)) begin
-
+		else if((product < 0) && (out < 0) && ((out + product) > 0)) begin
 			sum = MINVAL;
-
 		end
 		//If addition goes well
 		else begin
-
-			sum = product + feedback;
-			
+			sum = product + out;
 		end
-
 	end
 
 	//Register
 	always_ff @ (posedge clk) begin
 
-		//As long as we don't get a clear or reset
-		if ((clear_acc == 0) || (reset == 0)) begin
-
-			//Need a valid input to copy onto out
-			if (valid_input == 1) begin
-
-				out <= sum;
-				feedback <= sum;
-
-			end
-		end
-		//If we get a reset or clear
-		else begin
-
+		//If there is a reset or clear, set the output to 0
+		if ((clear_acc == 1) || (reset == 1)) begin
 			out <= 0;
-			feedback <= 0;
-
 		end
-	
+		else begin
+			//If the input is valid, then send the saturated sum to the output
+			if (valid_input == 1) out <= sum;
+			else out <= out; //Required to remove the implied latch
+		end
 	end
-
 endmodule
