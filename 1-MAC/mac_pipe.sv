@@ -9,9 +9,9 @@ module mac_pipe #(
 	input clk, reset, clear_acc, valid_input
 );
 	
-	logic [2*INW-1:0] product;		
-	logic [OUTW-1:0] sum;
-    logic [2*INW-1:0] add1;
+	logic signed [2*INW-1:0] product;		
+	logic signed [OUTW-1:0] sum;
+    logic signed [2*INW-1:0] add1;
 
 	//Multiply two values
 	always_comb begin
@@ -34,7 +34,7 @@ module mac_pipe #(
 		//Complete the saturation detection here.
 		//If the signs of the two input match, we may have overflowed. 
 		//Further check if the sign has flipped in the sum. If the sign has flipped, then we have overflowed.
-		if ((out[OUTW-1] == add1[2*INW-1-1]) && (sum[OUTW-1] != out[OUTW-1])) begin
+		if ((out[OUTW-1] == add1[2*INW-1]) && (sum[OUTW-1] != out[OUTW-1])) begin
 			//Check which way we have overflowed
 			if (sum[OUTW-1] == 1) sum = MAXVAL;
 			else sum = MINVAL;

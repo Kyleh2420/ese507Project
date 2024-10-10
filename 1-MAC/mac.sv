@@ -9,8 +9,8 @@ module mac #(
 	input clk, reset, clear_acc, valid_input
 );
 	
-	logic [2*INW-1:0] product;		
-	logic [OUTW-1:0] sum;
+	logic signed [2*INW-1:0] product;		
+	logic signed [OUTW-1:0] sum;
 
 	//Multiply two values
 	always_comb begin
