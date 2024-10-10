@@ -30,7 +30,7 @@ synthSetup:
 #Runs the synthesis and sends the output to output.txt
 .PHONY: synth
 synth:
-	dc_shell -f runsynth.tcl | tee output.txt
+	dc_shell -f runsynth.tcl | tee synth_mac.txt
 #Terminal target - runs vsim with an input variable passed as an argument
 .PHONY: simulate
 simulate:

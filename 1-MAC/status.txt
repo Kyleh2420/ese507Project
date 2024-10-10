@@ -1,0 +1,14 @@
+Johnny Liu (113517941) and Kyle Han (113799110) 
+
+Both designs, mac and mac_pipe, fully work. They have been tested with the provided testbench 
+using varying INW and OUTW sizes from 0 to 48 and has resulted in 0 errors. 
+
+
+Fastest Clock Frequency: 
+module         |    period  |   Frequency
+MAC:           |    2ns     |    500 MHz
+MAC_Pipelined: |    1.25ns  |    800 MHz
+
+There are 0 synthesis warnings or errors. 
+
+For this part of the project, Johnny completed the mac.sv while Kyle completed the synthesis tests and mac_pipe.sv.
