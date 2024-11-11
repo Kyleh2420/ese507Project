@@ -156,7 +156,7 @@ module input_mems #(
                             //This should handle matrixB shenanigans
 
                             //If the currentAddress = maxB, then move onto the next state, memRead
-                            if (bCurrentAddress == (localK * M) - 1) begin 
+                            if (bCurrentAddress == (localK * N) - 1) begin 
                                 nextState = memRead; 
                                 bWriteEnable = 0;
                             end
@@ -173,7 +173,7 @@ module input_mems #(
                             //This should handle matrixA shenanigans
 
                             //If the currentAddress = maxA, then set localA to 0, indicating that we should move to reading matrixB
-                            if (aCurrentAddress == (localK * N) - 1) begin
+                            if (aCurrentAddress == (localK * M) - 1) begin
                                 localA = 0;
                                 aWriteEnable = 0;   //Make sure to close off aWriteEnable
                             end else begin
