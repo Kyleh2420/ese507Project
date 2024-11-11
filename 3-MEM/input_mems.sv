@@ -101,12 +101,11 @@ module input_mems #(
                     bCurrentAddress = 1;
                     aCurrentAddress = 1;
 
-                    //Update local variables
-                    localA = new_A;
-                    localK = TUSER_K;
-
                     //First check if the data stream is ready and valid
-                    if (AXIS_TVALID) begin
+                    if (AXIS_TVALID == 1) begin
+                        //Update local variables
+                        localA = new_A;
+                        localK = TUSER_K;
 
                         //If new_A = 1, we have to load the new A Matrix. Else, we load in B Matrix
                         if (new_A == 1) begin
@@ -116,7 +115,7 @@ module input_mems #(
                             bWriteEnable = 0;
 
                             //Load first bit of new A Matrix
-                            aDataIn = localA;
+                            aDataIn = AXIS_TDATA;
 
                         end else begin
                             
@@ -125,15 +124,18 @@ module input_mems #(
                             aWriteEnable = 0;
 
                             //Load first bit of B Matrix
-                            bDataIn = localA;
-
+                            bDataIn = AXIS_TDATA;
                         end
 
+                        nextState = takeInData;
+                        AXIS_TREADY = 1;
+                        matrices_loaded = 0;
+
+                    end else begin
+                        nextState = takeInFirst;
                     end
 
-                    nextState = takeInData;
-                    AXIS_TREADY = 1;
-                    matrices_loaded = 0;
+                    
 
                 end
 
@@ -146,14 +148,15 @@ module input_mems #(
                     //Then, increment currentAddress
 
                     //aCurrentAddress and bCurrentAddress have been set to 1 by the FSM in state takeInFirst
+                    AXIS_TREADY = 1;
 
                     //On each clock cycle, the data is only valid if AXIS_TVALID is set to 1 and AXIS_TREADY is set to 1
-                    if (AXIS_TVALID && AXIS_TREADY) begin
+                    if (AXIS_TVALID == 1) begin
                         if (localA == 0) begin
                             //This should handle matrixB shenanigans
 
                             //If the currentAddress = maxB, then move onto the next state, memRead
-                            if (bCurrentAddress == 2**(B_ADDR_BITS)-1) begin 
+                            if (bCurrentAddress == (localK * M) - 1) begin 
                                 nextState = memRead; 
                                 bWriteEnable = 0;
                             end
@@ -170,7 +173,7 @@ module input_mems #(
                             //This should handle matrixA shenanigans
 
                             //If the currentAddress = maxA, then set localA to 0, indicating that we should move to reading matrixB
-                            if (aCurrentAddress == 2**(A_ADDR_BITS)-1) begin
+                            if (aCurrentAddress == (localK * N) - 1) begin
                                 localA = 0;
                                 aWriteEnable = 0;   //Make sure to close off aWriteEnable
                             end else begin
