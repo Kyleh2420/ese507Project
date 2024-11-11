@@ -1,0 +1,40 @@
+# vsim -64 -sv_seed random -c fifo_out_tb -do "run -all; quit" 
+# Start time: 16:48:00 on Oct 23,2024
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Warning: (vopt-10587) Some optimizations are turned off because the +acc switch is in effect. This will cause your simulation to run slowly. Please use -access/-debug to maintain needed visibility.
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
+# //  Questa Sim-64
+# //  Version 2023.4_3 linux_x86_64 Feb 17 2024
+# //
+# //  Copyright 1991-2024 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.fifo_out_tb(fast)
+# Loading work.fifo_out(fast)
+# Loading work.memory_dual_port(fast)
+# Sv_Seed = 2013674402
+# run -all
+# --------------------------------------------------------
+# Starting simulation of output FIFO:       10000 tests
+# Number of bits:          17
+# FIFO Depth:          48
+# WRITE_EN_PROB = 0.010
+# TREADY_PROB = 0.990
+# --------------------------------------------------------
+# Tested       10000 inputs.           0 errors
+# ** Note: $stop    : fifo_out_tb.sv(137)
+#    Time: 10310065 ns  Iteration: 0  Instance: /fifo_out_tb
+# Break in Module fifo_out_tb at fifo_out_tb.sv line 137
+# Stopped at fifo_out_tb.sv line 137
+#  quit
+# End time: 16:48:00 on Oct 23,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 1

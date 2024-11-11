@@ -1,0 +1,187 @@
+m255
+K4
+z2
+Z0 !s12c _opt
+Z1 !s99 nomlopt
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+Z2 !s12c _opt1
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R0
+R1
+R0
+R1
+!s11f MIXED_VERSIONS
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z3 d/home/home5/joliu/ese507/project/ese507Project/2-FIFO
+T_opt
+!s110 1729716480
+Vz5IOo^Ygj;WVPHld@475f3
+Z4 04 11 4 work fifo_out_tb fast 0
+=1-cc96e53dbe82-67196100-156c0-a1ba2
+R1
+Z5 !s12f OEM100
+Z6 !s12b OEM100
+Z7 !s124 OEM100
+Z8 o-quiet -auto_acc_if_foreign -work work
+Z9 tCvgOpt 0
+n@_opt
+Z10 OL;O;2023.4_3;77
+T_opt1
+!s110 1729550575
+V2U:RU?@`GTh5IOfDo2A=Q0
+R4
+=1-cc96e53dbe82-6716d8ef-94eaf-96b79
+R1
+R5
+R6
+R7
+R8
+R9
+n@_opt1
+R10
+R3
+vfifo_out
+Z11 2fifo_out.sv|fifo_out_tb.sv|params.sv
+Z12 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z13 !s110 1729716479
+!i10b 1
+!s100 kUQN2_=og@dXBk2a``66n0
+Ic[T05o>AVjQVg[8=9lUz_3
+S1
+R3
+Z14 w1729716260
+Z15 8fifo_out.sv
+Z16 Ffifo_out.sv
+!i122 88
+L0 22 94
+Z17 VDg1SIo80bB@j0V0VzS_@n1
+Z18 OL;L;2023.4_3;77
+r1
+!s85 0
+31
+Z19 !s108 1729716479.000000
+Z20 !s107 params.sv|fifo_out_tb.sv|fifo_out.sv|
+Z21 !s90 +acc|fifo_out.sv|fifo_out_tb.sv|params.sv|
+!i113 0
+Z22 o+acc -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R9
+vfifo_out_tb
+R11
+R12
+R13
+!i10b 1
+!s100 X7[IN[nfOfS[bZB7eECen1
+II;RRlGmS9NXMgoZee18Rf1
+S1
+R3
+w1729535439
+8fifo_out_tb.sv
+Ffifo_out_tb.sv
+!i122 88
+L0 21 121
+R17
+R18
+r1
+!s85 0
+31
+R19
+R20
+R21
+!i113 0
+R22
+R9
+vmemory_dual_port
+R11
+R12
+R13
+!i10b 1
+!s100 Nm`eQO`nbUQNac@NA<1kR2
+I2ffAJP[n?NSlFAHD6lXQ43
+S1
+R3
+R14
+R15
+R16
+!i122 88
+L0 1 20
+R17
+R18
+r1
+!s85 0
+31
+R19
+R20
+R21
+!i113 0
+R22
+R9
