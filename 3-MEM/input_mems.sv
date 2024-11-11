@@ -53,10 +53,13 @@ module input_mems #(
 
     //Named nets between the memory modules (Just to keep things organized)
     logic[WIDTH-1:0] aDataIn, bDataIn, aDataOut, bDataOut;
-    logic[LOGSIZE-1:0] aAddress, bAddress;
+    logic[A_ADDR_BITS-1:0] aAddress;
+    logic[B_ADDR_BITS-1:0] bAddress;
     logic aWriteEnable, bWriteEnable;
 
     //"Local Variables" 
+    //This variable stores the current address being written to by the takeInData stage
+    logic[LOGSIZE-1:0] currentAddress;
     //This variable stores the value of T User A (If the value being read should go into Matrix A or Matrix B)
     logic localNewA;
     //This variable stores the value of K (The shared parameter between Matrix A [MxK] and Matrix B[KxN])
@@ -104,6 +107,9 @@ module input_mems #(
 
                 takeInData: begin
                     //Take in data stuff goes here
+                    //This state should taken in data for every clock cycle and store it into the address indicated to by 'currentAddress'.
+                    //The max of currentAddress is inidated by A_ADDR_BITS-1 or B_ADDR_BITS-1 depending on the value of newA
+                    //if newA = 1
                 end
 
                 memRead: begin
