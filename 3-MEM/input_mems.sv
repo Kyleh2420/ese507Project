@@ -51,9 +51,16 @@ module input_mems #(
     enum {waitForValid, takeInFirst, takeInData, memRead} currentState, nextState;
 
 
+    //Named nets between the memory modules (Just to keep things organized)
     logic[WIDTH-1:0] aDataIn, bDataIn, aDataOut, bDataOut;
     logic[LOGSIZE-1:0] aAddress, bAddress;
     logic aWriteEnable, bWriteEnable;
+
+    //"Local Variables" 
+    //This variable stores the value of T User A (If the value being read should go into Matrix A or Matrix B)
+    logic localNewA;
+    //This variable stores the value of K (The shared parameter between Matrix A [MxK] and Matrix B[KxN])
+    logic localK;
     
 
     //Memory instantiation for both A and B
@@ -88,7 +95,13 @@ module input_mems #(
 
             unique case (currentState)
                 waitForValid: begin
-                    //wait for valid case goes here
+                    //If AXIS_TREADY = 0 or AXIS_VALID = 0, then the nextState is waitForValid
+                    //If AXIS_TREADY = 1 and AXIS_VALUD = 1, then next state is takeInFirst
+                    if (AXIS_TREADY == 1 && AXIS_TVALID == 1) begin
+                        nextState = takeInFirst;
+                    end else begin
+                        nextState = waitForValid;
+                    end
                 end
 
                 takeInFirst: begin
