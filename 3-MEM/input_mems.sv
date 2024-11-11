@@ -104,11 +104,7 @@ module input_mems #(
                     end
                 end
 
-                takeInFirst: begin
-
-                    //Set next state
-                    currentState = nextState;
-                    
+                takeInFirst: begin                    
                     //Set current addresses to 1 because we are already working with address = 0
                     bCurrentAddress = 1;
                     aCurrentAddress = 1;
@@ -124,15 +120,17 @@ module input_mems #(
                         if (new_A == 1) begin
                             
                             //First assert wr_en for A Matrix
-                            aWriteEnable <= 1;
+                            aWriteEnable = 1;
+                            bWriteEnable = 0;
 
                             //Load first bit of new A Matrix
-                            aDataIn <= localA;
+                            aDataIn = localA;
 
                         end else begin
                             
                             //Assert wr_en for B Matrix
-                            bWriteEnable <= 1;
+                            bWriteEnable = 1;
+                            aWriteEnable = 0;
 
                             //Load first bit of B Matrix
                             bDataIn <= localA;
@@ -140,6 +138,8 @@ module input_mems #(
                         end
 
                     end
+
+                    nextState = takeInData;
 
                 end
 
@@ -153,8 +153,8 @@ module input_mems #(
 
                     //aCurrentAddress and bCurrentAddress have been set to 1 by the FSM in state takeInFirst
 
-                    //On each clock cycle, the data is only valid if AXIS_TVALID is set to 1
-                    if (AXIS_TVALID = 1) begin
+                    //On each clock cycle, the data is only valid if AXIS_TVALID is set to 1 and AXIS_TREADY is set to 1
+                    if (AXIS_TVALID && AXIS_TREADY) begin
                         if (localA == 0) begin
                             //This should handle matrixB shenanigans
 
