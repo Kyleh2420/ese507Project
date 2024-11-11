@@ -87,36 +87,37 @@ module input_mems #(
     always_comb begin
         A_data = aDataOut;
         B_data = bDataOut;
-
+        //We'll send this to both memory registers and hope and pray that the FSM will handle the enables correctly
+        aDataIn = AXIS_TDATA;
+        bDataIn = AXIS_TDATA;
 
         //This should create a MUX
-        if (currentState == takeInFirst) begin
-            //takeInFirst State
-            matrices_loaded = 0;
-            aAddress = aCurrentAddress;
-            bAddress = bCurrentAddress;
-            aDataIn = AXIS_TDATA;
-            bDataIn = AXIS_TDATA;
+        unique case (currentState)
+            takeInFirst: begin
+                //takeInFirst State
+                matrices_loaded = 0;
+                aAddress = aCurrentAddress;
+                bAddress = bCurrentAddress;
 
-        end else if (currentState == takeInData) begin
-            //takeInData State
-            matrices_loaded = 0;
-            aAddress = aCurrentAddress;
-            bAddress = bCurrentAddress;
+            end 
+                takeInData: begin
+                //takeInData State
+                matrices_loaded = 0;
+                aAddress = aCurrentAddress;
+                bAddress = bCurrentAddress;
 
-            //We'll send this to both memory registers and hope and pray that the FSM will handle the enables correctly
-            aDataIn = AXIS_TDATA;
-            bDataIn = AXIS_TDATA;
-            
-        end else begin
-            //memRead state
-            matrices_loaded = 1;
-            K = localK;
+                
+            end 
+                memRead: begin
+                //memRead state
+                matrices_loaded = 1;
+                K = localK;
 
-            aAddress = A_read_addr;
-            bAddress = B_read_addr;
+                aAddress = A_read_addr;
+                bAddress = B_read_addr;
 
-        end
+            end
+        endcase
 
     end
 
@@ -135,6 +136,8 @@ module input_mems #(
         unique case (currentState)
                 takeInFirst: begin
                     AXIS_TREADY = 1;
+                    aWriteEnable = 1;
+                    bWriteEnable = 1;
                     //First check if the data stream is ready and valid
                     if (AXIS_TVALID == 1) begin
                         //Update local variables
@@ -142,15 +145,15 @@ module input_mems #(
                         localK = TUSER_K;
                         bCurrentAddress = 0;
                         aCurrentAddress = 0;
-                        if (new_A == 1) begin
-                            //First assert wr_en for A Matrix
-                            aWriteEnable = 1;
-                            bWriteEnable = 0;
-                        end else begin
-                            //Assert wr_en for B Matrix 
-                            bWriteEnable = 1;   
-                            aWriteEnable = 0;
-                        end
+                        // if (new_A == 1) begin
+                        //     //First assert wr_en for A Matrix
+                        //     aWriteEnable = 1;
+                        //     bWriteEnable = 0;
+                        // end else begin
+                        //     //Assert wr_en for B Matrix 
+                        //     bWriteEnable = 1;   
+                        //     aWriteEnable = 0;
+                        // end
 
                         nextState = takeInData;
                     end else begin
