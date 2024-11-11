@@ -95,23 +95,8 @@ module input_mems #(
             matrices_loaded = 0;
             aAddress = aCurrentAddress;
             bAddress = bCurrentAddress;
-
-            //First check if the data stream is ready and valid
-            if (AXIS_TVALID == 1) begin
-                //new_A is set within the flipflop
-                //If new_A = 1, we have to load the new A Matrix. Else, we load in B Matrix
-                if (new_A == 1) begin
-
-                    //Load first bit of new A Matrix
-//                    aAddress = 0;, set by the FSM
-                    aDataIn = AXIS_TDATA;
-                end else begin
-
-                    //Load first bit of B Matrix
-//                    bAddress = 0;, set by the FSM
-                    bDataIn = AXIS_TDATA;
-                end
-            end
+            aDataIn = AXIS_TDATA;
+            bDataIn = AXIS_TDATA;
 
         end else if (currentState == takeInData) begin
             //takeInData State
@@ -119,16 +104,10 @@ module input_mems #(
             aAddress = aCurrentAddress;
             bAddress = bCurrentAddress;
 
-            //On each clock cycle, the data is only valid if AXIS_TVALID is set to 1
-            if (AXIS_TVALID == 1) begin
-                if (localA == 0) begin
-                    //This should handle matrixB shenanigans
-                    bDataIn = AXIS_TDATA;
-                    end
-                end else begin 
-                    //This should handle matrixA shenanigans
-                    aDataIn = AXIS_TDATA;
-                end
+            //We'll send this to both memory registers and hope and pray that the FSM will handle the enables correctly
+            aDataIn = AXIS_TDATA;
+            bDataIn = AXIS_TDATA;
+            
         end else begin
             //memRead state
             matrices_loaded = 1;
@@ -161,21 +140,16 @@ module input_mems #(
                         //Update local variables
                         localA = new_A;
                         localK = TUSER_K;
+                        bCurrentAddress = 0;
+                        aCurrentAddress = 0;
                         if (new_A == 1) begin
                             //First assert wr_en for A Matrix
                             aWriteEnable = 1;
                             bWriteEnable = 0;
-                            //We've read in the first value, so set the aCurrentAddress to 1, and b to 0
-                            aCurrentAddress= 1;
-                            bCurrentAddress = 0;
                         end else begin
                             //Assert wr_en for B Matrix 
                             bWriteEnable = 1;   
                             aWriteEnable = 0;
-
-                                                //We've read in the first value, so set the aCurrentAddress to 0, and b to 1
-                            bCurrentAddress = 1;
-                            aCurrentAddress = 0;
                         end
 
                         nextState = takeInData;
@@ -199,7 +173,7 @@ module input_mems #(
                         if(localA == 0) begin
                             //MatrixB stuff
                             //If MatrixB is done reading, move onto the next state
-                            if (bCurrentAddress == (localK * N)) begin
+                            if (bCurrentAddress == (localK * N)-1) begin
                                 nextState = memRead;
                                 bWriteEnable = 0;
                             end
@@ -213,7 +187,7 @@ module input_mems #(
                             //MatrixA stuff
                             nextState = takeInData;
                             //If MatrixA is done reading, move onto reading Matrix B
-                            if (aCurrentAddress == (localK * M)) begin
+                            if (aCurrentAddress == (localK * M)-1) begin
                                 localA = 0;
                                 aWriteEnable = 0;   //Make sure to close off aWriteEnable
                             end else begin
@@ -228,15 +202,11 @@ module input_mems #(
                 end
 
                 memRead: begin
+                    AXIS_TREADY = 0;
                     //memory read stuff goes in here first
                     //This state changes when compute_finished = 1 and moves the FSM back to waitForValid
                     if (compute_finished == 1) begin
                         nextState = takeInFirst;
-                        AXIS_TREADY = 1;
-                    end else begin
-                        //We cannot accept new data until compute_ready is done
-                        AXIS_TREADY = 0;    
-                        //For the items that memRead may do, check the combinational circuit, which creates a MUX to switch between the register and the memory                    
                     end
                 end 
             
