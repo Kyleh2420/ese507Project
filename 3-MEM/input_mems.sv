@@ -78,13 +78,7 @@ module input_mems #(
         .clk(clk),
         .wr_en(bWriteEnable)
     );
-    
-    
 
-
-    //Enable signal
-
-    //TDATA and TUSER data transmission
     always_ff @(posedge clk) begin
         if (reset == 1) begin
             //Code to reset everything back to 0
