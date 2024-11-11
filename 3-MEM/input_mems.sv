@@ -102,7 +102,42 @@ module input_mems #(
                 end
 
                 takeInFirst: begin
-                    //take in first stuff goes here
+
+                    //Set next state
+                    currentState = nextState;
+                    
+                    //Set current addresses to 1 because we are already working with address = 0
+                    bCurrentAddress = 1;
+                    aCurrentAddress = 1;
+
+                    //Update local variables
+                    localA <= new_A;
+                    localK <= TUSER_K;
+
+                    //First check if the data stream is ready and valid
+                    if (AXIS_TREADY && AXIS_TVALID) begin
+
+                        //If new_A = 1, we have to load the new A Matrix. Else, we load in B Matrix
+                        if (new_A == 1) begin
+                            
+                            //First assert wr_en for A Matrix
+                            aWriteEnable <= 1;
+
+                            //Load first bit of new A Matrix
+                            aDataIn <= localA;
+
+                        end else begin
+                            
+                            //Assert wr_en for B Matrix
+                            bWriteEnable <= 1;
+
+                            //Load first bit of B Matrix
+                            bDataIn <= localA;
+
+                        end
+
+                    end
+
                 end
 
                 takeInData: begin
