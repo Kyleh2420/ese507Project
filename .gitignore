@@ -5,3 +5,9 @@
 /1-MAC/work/
 /1-MAC/work_synth/
 /1-MAC/alib-52/
+/3-MEM/cds.lib
+/3-MEM/lib.defs
+/3-MEM/memory.sv
+/3-MEM/params.sv
+/3-MEM/transcript
+/3-MEM/vsim.wlf
