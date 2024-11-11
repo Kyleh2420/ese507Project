@@ -60,8 +60,11 @@ module input_mems #(
 
         if(reset == 0) begin
 
-            if(AXIS)_TREADY && AXIS_TVALID) begin
+            if(AXIS_TREADY && AXIS_TVALID) begin
 
                 AXIS_TDATA <= 
+            end
+        end
+    end
 endmodule
 
