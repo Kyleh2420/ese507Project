@@ -66,6 +66,9 @@ module input_mems #(
     logic localA;
     //This variable stores the value of K (The shared parameter between Matrix A [MxK] and Matrix B[KxN])
     logic [K_BITS-1:0] localK;
+
+    logic [A_ADDR_BITS-1:0] aCurrentAddress_ff;
+    logic [B_ADDR_BITS-1:0] bCurrentAddress_ff;
     
 
     //Memory instantiation for both A and B
@@ -84,6 +87,35 @@ module input_mems #(
         .wr_en(bWriteEnable)
     );
 
+    always_comb begin
+        A_data = aDataOut;
+        B_data = bDataOut;
+
+
+        //This should create a MUX
+        if (currentState == takeInFirst) begin
+            //takeInFirst State
+            matrices_loaded = 0;
+            aAddress = aCurrentAddress_ff;
+            bAddress = bCurrentAddress_ff;
+
+        end else if (currentState == takeInData) begin
+            //takeInData State
+            matrices_loaded = 0;
+            aAddress = aCurrentAddress_ff;
+            bAddress = bCurrentAddress_ff;
+        end else begin
+            //memRead state
+            matrices_loaded = 1;
+            K = localK;
+
+            aAddress = A_read_addr;
+            bAddress = B_read_addr;
+
+        end
+
+    end
+
     always_ff @(posedge clk) begin
     //Everything in this if block should be wrapped in another if statement, which ensures TVALID is 1
     //State stuff goes here
@@ -91,7 +123,6 @@ module input_mems #(
         if (reset == 1) begin 
             currentState = takeInFirst;
             AXIS_TREADY = 1;
-            matrices_loaded = 0;
         end else begin
 
         currentState = nextState;
@@ -101,7 +132,6 @@ module input_mems #(
 
                 takeInFirst: begin
                     AXIS_TREADY = 1;
-                    matrices_loaded = 0;
 
                     //First check if the data stream is ready and valid
                     if (AXIS_TVALID == 1) begin
@@ -117,10 +147,10 @@ module input_mems #(
                             bWriteEnable = 0;
 
                             //We've read in the first value, so set the aCurrentAddress to 1, and b to 0
-                            aCurrentAddress = 1;
-                            bCurrentAddress = 0;
+                            aCurrentAddress_ff = 1;
+                            bCurrentAddress_ff = 0;
                             //Load first bit of new A Matrix
-                            aAddress = 0;
+//                            aAddress = 0;
                             aDataIn = AXIS_TDATA;
                         end else begin
                             
@@ -129,11 +159,11 @@ module input_mems #(
                             aWriteEnable = 0;
 
                             //We've read in the first value, so set the aCurrentAddress to 0, and b to 1
-                            bCurrentAddress = 1;
-                            aCurrentAddress = 0;
+                            bCurrentAddress_ff = 1;
+                            aCurrentAddress_ff = 0;
 
                             //Load first bit of B Matrix
-                            bAddress = 0;
+//                            bAddress = 0;
                             bDataIn = AXIS_TDATA;
                         end
                         nextState = takeInData;
@@ -162,7 +192,7 @@ module input_mems #(
                             //This should handle matrixB shenanigans
 
                             //If the currentAddress = maxB, then move onto the next state, memRead
-                            if (bCurrentAddress == (localK * N)) begin 
+                            if (bCurrentAddress_ff == (localK * N)) begin 
                                 nextState = memRead; 
                                 bWriteEnable = 0;
                             end
@@ -173,14 +203,14 @@ module input_mems #(
                                 bWriteEnable = 1;
                                 aWriteEnable = 0;
                                 bDataIn = AXIS_TDATA;
-                                bAddress = bCurrentAddress;
-                                bCurrentAddress = bCurrentAddress + 1;
+//                                bAddress = bCurrentAddress;
+                                bCurrentAddress_ff = bCurrentAddress_ff + 1;
                             end
                         end else begin 
                             //This should handle matrixA shenanigans
 
                             //If the currentAddress = maxA, then set localA to 0, indicating that we should move to reading matrixB
-                            if (aCurrentAddress == (localK * M)) begin
+                            if (aCurrentAddress_ff == (localK * M)) begin
                                 localA = 0;
                                 aWriteEnable = 0;   //Make sure to close off aWriteEnable
                             end else begin
@@ -190,8 +220,8 @@ module input_mems #(
                                 aWriteEnable = 1;
                                 bWriteEnable = 0;
                                 aDataIn = AXIS_TDATA;
-                                aAddress = aCurrentAddress;
-                                aCurrentAddress = aCurrentAddress + 1;
+//                                aAddress = aCurrentAddress_ff;
+                                aCurrentAddress_ff = aCurrentAddress_ff + 1;
                             end
                         end
                     end
@@ -202,20 +232,11 @@ module input_mems #(
                     //This state changes when compute_finished = 1 and moves the FSM back to waitForValid
                     if (compute_finished == 1) begin
                         nextState = takeInFirst;
-                        matrices_loaded = 0;
                         AXIS_TREADY = 1;
                     end else begin
                         //We cannot accept new data until compute_ready is done
-                        AXIS_TREADY = 0;
-                        matrices_loaded = 1;
-                        K = localK;
-
-                        aAddress = A_read_addr;
-                        bAddress = B_read_addr;
-
-                        A_data = aDataOut;
-                        B_data = bDataOut;
-
+                        AXIS_TREADY = 0;    
+                        //For the items that memRead may do, check the combinational circuit, which creates a MUX to switch between the register and the memory                    
                     end
                 end 
             
