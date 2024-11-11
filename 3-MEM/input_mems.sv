@@ -40,10 +40,28 @@ module input_mems #(
         output logic signed [INW-1:0] B_data
     );
 
+    //Memory instantiation
+    memory #(INW,A_ADDR_BITS) matrixA(
+        .data_in(A_data),
+        .data_out(),
+        .addr(A_read_addr),
+        .clk(clk),
+        .wr_en()            //Not sure if 
+    );
+    
+    //New matrix A detection instantiation
+    logic new_A;
+    assign new_A = AXIS_TUSER[0];
+
+    //Enable signal
+
     //TDATA and TUSER data transmission
     always_ff @(posedge clk) begin
 
         if(reset == 0) begin
-            
+
+            if(AXIS)_TREADY && AXIS_TVALID) begin
+
+                AXIS_TDATA <= 
 endmodule
 
