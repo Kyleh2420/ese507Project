@@ -59,11 +59,13 @@ module input_mems #(
 
     //"Local Variables" 
     //This variable stores the current address being written to by the takeInData stage
-    logic[LOGSIZE-1:0] currentAddress;
+    //The max value should be A_addr_bits or B_Addr_bits
+    logic reg [A_ADDR_BITS-1:0] aCurrentAddress;
+    logic reg[B_ADDR_BITS-1:0] bCurrentAddress;
     //This variable stores the value of T User A (If the value being read should go into Matrix A or Matrix B)
-    logic localNewA;
+    logic reg localA;
     //This variable stores the value of K (The shared parameter between Matrix A [MxK] and Matrix B[KxN])
-    logic localK;
+    logic reg localK;
     
 
     //Memory instantiation for both A and B
@@ -87,6 +89,7 @@ module input_mems #(
             //Code to reset everything back to 0
             //Reset state to waitForValid
         end else begin 
+            //Everything in this if block should be wrapped in another if statement, which ensures TVALID is 1
             //State stuff goes here
             currentState = nextState
 
@@ -144,7 +147,46 @@ module input_mems #(
                     //Take in data stuff goes here
                     //This state should taken in data for every clock cycle and store it into the address indicated to by 'currentAddress'.
                     //The max of currentAddress is inidated by A_ADDR_BITS-1 or B_ADDR_BITS-1 depending on the value of newA
-                    //if newA = 1
+                    //if newA = 1, then the address refers to matrix A
+                    //if newA = 0, then the address refers to matrix B
+                    //Then, increment currentAddress
+
+                    //aCurrentAddress and bCurrentAddress have been set to 1 by the FSM in state takeInFirst
+                    
+                    if (localA == 0) begin
+                        //This should handle matrixB shenanigans
+
+                        //If the currentAddress = maxB, then move onto the next state, memRead
+                        if (bCurrentAddress == B_ADDR_BITS-1) begin 
+                            nextState = memRead; 
+                            bWriteEnable = 0;
+                        end
+                        else begin
+                            nextState = takeInData;
+
+                            //Store the data from AXIS_TDATA to the current address, then increment the current address
+                            bWriteEnable = 1;
+                            bDataIn = AXIS_TDATA;
+                            bAddress = bCurrentAddress;
+                            bCurrentAddress = bCurrentAddress + 1;
+                        end
+                    end else begin 
+                        //This should handle matrixA shenanigans
+
+                        //If the currentAddress = maxA, then set localA to 0, indicating that we should move to reading matrixB
+                        if (aCurrentAddress == A_ADDR_BITS-1) begin
+                            localA = 0;
+                            aWriteEnable = 0;   //Make sure to close off aWriteEnable
+                        end else begin
+                            nextState = takeInData;
+
+                            //Store the data from AXIS_TDATA to the current address, then increment the current address
+                            aWriteEnable = 1;
+                            aDataIn = AXIS_TDATA;
+                            aAddress = aCurrentAddress;
+                            aCurrentAddress = aCurrentAddress + 1;
+                        end
+                    end
                 end
 
                 memRead: begin
