@@ -40,30 +40,70 @@ module input_mems #(
         output logic signed [INW-1:0] B_data
     );
 
-    //Memory instantiation
-    memory #(INW,A_ADDR_BITS) matrixA(
-        .data_in(A_data),
-        .data_out(),
-        .addr(A_read_addr),
-        .clk(clk),
-        .wr_en()            //Not sure if 
-    );
-    
-    //New matrix A detection instantiation
+    //Logic symbols to assist in seperating out newA and K from the line AXIS_TUSER
     logic new_A;
     assign new_A = AXIS_TUSER[0];
+
+    logic [$clog2(MAXK+1)-1:0] TUSER_K;
+    assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1];
+
+    //Enumeration to control states
+    enum {waitForValid, takeInFirst, takeInData, memRead} currentState, nextState;
+
+
+    logic[WIDTH-1:0] aDataIn, bDataIn, aDataOut, bDataOut;
+    logic[LOGSIZE-1:0] aAddress, bAddress;
+    logic aWriteEnable, bWriteEnable;
+    
+
+    //Memory instantiation for both A and B
+    memory #(INW,A_ADDR_BITS) matrixA(
+        .data_in(aDataIn),
+        .data_out(aDataOut),
+        .addr(aAddress),
+        .clk(clk),
+        .wr_en(aWriteEnable)
+    );
+    memory #(INW,A_ADDR_BITS) matrixB(
+        .data_in(bDataIn),
+        .data_out(bDataOut),
+        .addr(bAddress),
+        .clk(clk),
+        .wr_en(bWriteEnable)
+    );
+    
+    
+
 
     //Enable signal
 
     //TDATA and TUSER data transmission
     always_ff @(posedge clk) begin
+        if (reset == 1) begin
+            //Code to reset everything back to 0
+            //Reset state to waitForValid
+        end else begin 
+            //State stuff goes here
+            currentState = nextState
 
-        if(reset == 0) begin
+            unique case (currentState)
+                waitForValid: begin
+                    //wait for valid case goes here
+                end
 
-            if(AXIS_TREADY && AXIS_TVALID) begin
+                takeInFirst: begin
+                    //take in first stuff goes here
+                end
 
-                AXIS_TDATA <= 
-            end
+                takeInData: begin
+                    //Take in data stuff goes here
+                end
+
+                memRead: begin
+                    //memory read stuff goes in here first
+                end 
+            
+            endcase
         end
     end
 endmodule
