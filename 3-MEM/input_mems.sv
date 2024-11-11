@@ -48,11 +48,11 @@ module input_mems #(
     assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1];
 
     //Enumeration to control states
-    enum {waitForValid, takeInFirst, takeInData, memRead} currentState, nextState;
+    enum {takeInFirst, takeInData, memRead} currentState, nextState;
 
 
     //Named nets between the memory modules (Just to keep things organized)
-    logic[WIDTH-1:0] aDataIn, bDataIn, aDataOut, bDataOut;
+    logic[INW-1:0] aDataIn, bDataIn, aDataOut, bDataOut;
     logic[A_ADDR_BITS-1:0] aAddress;
     logic[B_ADDR_BITS-1:0] bAddress;
     logic aWriteEnable, bWriteEnable;
@@ -60,12 +60,12 @@ module input_mems #(
     //"Local Variables" 
     //This variable stores the current address being written to by the takeInData stage
     //The max value should be A_addr_bits or B_Addr_bits
-    logic reg [A_ADDR_BITS-1:0] aCurrentAddress;
-    logic reg[B_ADDR_BITS-1:0] bCurrentAddress;
+    logic [A_ADDR_BITS-1:0] aCurrentAddress;
+    logic [B_ADDR_BITS-1:0] bCurrentAddress;
     //This variable stores the value of T User A (If the value being read should go into Matrix A or Matrix B)
-    logic reg localA;
+    logic localA;
     //This variable stores the value of K (The shared parameter between Matrix A [MxK] and Matrix B[KxN])
-    logic reg [K_BITS-1:0] localK;
+    logic [K_BITS-1:0] localK;
     
 
     //Memory instantiation for both A and B
@@ -76,7 +76,7 @@ module input_mems #(
         .clk(clk),
         .wr_en(aWriteEnable)
     );
-    memory #(INW,A_ADDR_BITS) matrixB(
+    memory #(INW,B_ADDR_BITS) matrixB(
         .data_in(bDataIn),
         .data_out(bDataOut),
         .addr(bAddress),
@@ -88,21 +88,13 @@ module input_mems #(
         if (reset == 1) begin
             //Code to reset everything back to 0
             //Reset state to waitForValid
+            currentState = takeInFirst;
         end else begin 
             //Everything in this if block should be wrapped in another if statement, which ensures TVALID is 1
             //State stuff goes here
-            currentState = nextState
+            currentState = nextState;
 
             unique case (currentState)
-                waitForValid: begin
-                    //If AXIS_TREADY = 0 or AXIS_VALID = 0, then the nextState is waitForValid
-                    //If AXIS_TREADY = 1 and AXIS_VALUD = 1, then next state is takeInFirst
-                    if (AXIS_TREADY == 1 && AXIS_TVALID == 1) begin
-                        nextState = takeInFirst;
-                    end else begin
-                        nextState = waitForValid;
-                    end
-                end
 
                 takeInFirst: begin                    
                     //Set current addresses to 1 because we are already working with address = 0
@@ -110,11 +102,11 @@ module input_mems #(
                     aCurrentAddress = 1;
 
                     //Update local variables
-                    localA <= new_A;
-                    localK <= TUSER_K;
+                    localA = new_A;
+                    localK = TUSER_K;
 
                     //First check if the data stream is ready and valid
-                    if (AXIS_TREADY && AXIS_TVALID) begin
+                    if (AXIS_TVALID) begin
 
                         //If new_A = 1, we have to load the new A Matrix. Else, we load in B Matrix
                         if (new_A == 1) begin
@@ -133,13 +125,15 @@ module input_mems #(
                             aWriteEnable = 0;
 
                             //Load first bit of B Matrix
-                            bDataIn <= localA;
+                            bDataIn = localA;
 
                         end
 
                     end
 
                     nextState = takeInData;
+                    AXIS_TREADY = 1;
+                    matrices_loaded = 0;
 
                 end
 
@@ -159,7 +153,7 @@ module input_mems #(
                             //This should handle matrixB shenanigans
 
                             //If the currentAddress = maxB, then move onto the next state, memRead
-                            if (bCurrentAddress == B_ADDR_BITS-1) begin 
+                            if (bCurrentAddress == 2**(B_ADDR_BITS)-1) begin 
                                 nextState = memRead; 
                                 bWriteEnable = 0;
                             end
@@ -176,7 +170,7 @@ module input_mems #(
                             //This should handle matrixA shenanigans
 
                             //If the currentAddress = maxA, then set localA to 0, indicating that we should move to reading matrixB
-                            if (aCurrentAddress == A_ADDR_BITS-1) begin
+                            if (aCurrentAddress == 2**(A_ADDR_BITS)-1) begin
                                 localA = 0;
                                 aWriteEnable = 0;   //Make sure to close off aWriteEnable
                             end else begin
@@ -196,7 +190,7 @@ module input_mems #(
                     //memory read stuff goes in here first
                     //This state changes when compute_finished = 1 and moves the FSM back to waitForValid
                     if (compute_finished == 1) begin
-                        nextState = waitForValid;
+                        nextState = takeInFirst;
                         matrices_loaded = 0;
                         AXIS_TREADY = 1;
                     end else begin
@@ -208,8 +202,8 @@ module input_mems #(
                         aAddress = A_read_addr;
                         bAddress = B_read_addr;
 
-                        a_data = aDataOut;
-                        b_data = bDataOut;
+                        A_data = aDataOut;
+                        B_data = bDataOut;
 
                     end
                 end 
