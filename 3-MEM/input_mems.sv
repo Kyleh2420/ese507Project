@@ -98,6 +98,8 @@ module input_mems #(
                 matrices_loaded = 0;
                 aAddress = aCurrentAddress;
                 bAddress = bCurrentAddress;
+                aWriteEnable = 1;
+                bWriteEnable = 1;
 
             end 
                 takeInData: begin
@@ -105,6 +107,23 @@ module input_mems #(
                 matrices_loaded = 0;
                 aAddress = aCurrentAddress;
                 bAddress = bCurrentAddress;
+
+                if (bCurrentAddress == (localK * N)-1) begin
+                    bWriteEnable = 0;
+                    aWriteEnable = 1;
+                end else begin
+                    bWriteEnable = 1;
+                    aWriteEnable = 0;
+                end
+
+                if (aCurrentAddress == (localK * M)-1) begin
+                    bWriteEnable = 1;
+                    aWriteEnable = 0;
+                end else begin
+                    bWriteEnable = 0;
+                    aWriteEnable = 1;
+                end
+
 
                 
             end 
@@ -129,6 +148,8 @@ module input_mems #(
         if (reset == 1) begin 
             currentState = takeInFirst;
             AXIS_TREADY = 1;
+            aCurrentAddress = 0;
+            bCurrentAddress = 0;
         end else begin
 
         currentState = nextState;
@@ -136,24 +157,18 @@ module input_mems #(
         unique case (currentState)
                 takeInFirst: begin
                     AXIS_TREADY = 1;
-                    aWriteEnable = 1;
-                    bWriteEnable = 1;
                     //First check if the data stream is ready and valid
                     if (AXIS_TVALID == 1) begin
                         //Update local variables
                         localA = new_A;
                         localK = TUSER_K;
-                        bCurrentAddress = 0;
-                        aCurrentAddress = 0;
-                        // if (new_A == 1) begin
-                        //     //First assert wr_en for A Matrix
-                        //     aWriteEnable = 1;
-                        //     bWriteEnable = 0;
-                        // end else begin
-                        //     //Assert wr_en for B Matrix 
-                        //     bWriteEnable = 1;   
-                        //     aWriteEnable = 0;
-                        // end
+                        if (new_A == 1) begin
+                            //If we recieved from matrixA
+                            aCurrentAddress++;
+                        end else begin
+                            //If we recieved from matrixB
+                            bCurrentAddress++;
+                        end
 
                         nextState = takeInData;
                     end else begin
@@ -178,11 +193,11 @@ module input_mems #(
                             //If MatrixB is done reading, move onto the next state
                             if (bCurrentAddress == (localK * N)-1) begin
                                 nextState = memRead;
-                                bWriteEnable = 0;
+                                //bWriteEnable = 0;
                             end
                             else begin
-                                bWriteEnable = 1;
-                                aWriteEnable = 0;
+                                // bWriteEnable = 1;
+                                // aWriteEnable = 0;
                                 nextState = takeInData;
                                 bCurrentAddress = bCurrentAddress + 1;
                             end
@@ -192,11 +207,11 @@ module input_mems #(
                             //If MatrixA is done reading, move onto reading Matrix B
                             if (aCurrentAddress == (localK * M)-1) begin
                                 localA = 0;
-                                aWriteEnable = 0;   //Make sure to close off aWriteEnable
+                                //aWriteEnable = 0;   //Make sure to close off aWriteEnable
                             end else begin
                                 aCurrentAddress = aCurrentAddress + 1;
-                                aWriteEnable = 1;
-                                bWriteEnable = 0;
+                                // aWriteEnable = 1;
+                                // bWriteEnable = 0;
                             end
                         end
                     end
