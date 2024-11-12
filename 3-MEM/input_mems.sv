@@ -98,8 +98,13 @@ module input_mems #(
                 matrices_loaded = 0;
                 aAddress = aCurrentAddress;
                 bAddress = bCurrentAddress;
-                aWriteEnable = 1;
-                bWriteEnable = 1;
+                if (localA == 1) begin
+                    aWriteEnable = 1;
+                    bWriteEnable = 0;
+                end else begin
+                    aWriteEnable = 0;
+                    bWriteEnable = 1;
+                end
 
             end 
                 takeInData: begin
@@ -147,6 +152,8 @@ module input_mems #(
             AXIS_TREADY = 1;
             aCurrentAddress = 0;
             bCurrentAddress = 0;
+            localA = 1; //Assume we always have to read in matrixA first
+            
         end else begin
 
         currentState = nextState;
@@ -223,6 +230,10 @@ module input_mems #(
                     //This state changes when compute_finished = 1 and moves the FSM back to waitForValid
                     if (compute_finished == 1) begin
                         nextState = takeInFirst;
+
+                        //Reset current addressing to 0 for both a and b
+                        aCurrentAddress = 0;
+                        bCurrentAddress = 0;
                     end
                 end 
             
