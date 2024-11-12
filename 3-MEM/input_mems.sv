@@ -69,14 +69,14 @@ module input_mems #(
     
 
     //Memory instantiation for both A and B
-    memory #(INW,(2**A_ADDR_BITS)-1) matrixA(
+    memory #(INW,(2**A_ADDR_BITS)) matrixA(
         .data_in(aDataIn),
         .data_out(aDataOut),
         .addr(aAddress),
         .clk(clk),
         .wr_en(aWriteEnable)
     );
-    memory #(INW,(2**B_ADDR_BITS-1)) matrixB(
+    memory #(INW,(2**B_ADDR_BITS)) matrixB(
         .data_in(bDataIn),
         .data_out(bDataOut),
         .addr(bAddress),
@@ -108,27 +108,24 @@ module input_mems #(
                 aAddress = aCurrentAddress;
                 bAddress = bCurrentAddress;
 
-                if (bCurrentAddress == (localK * N)-1) begin
+                //localA is controlled by the FSM
+                if (localA == 1) begin
                     bWriteEnable = 0;
                     aWriteEnable = 1;
                 end else begin
                     bWriteEnable = 1;
                     aWriteEnable = 0;
+                    if (nextState == memRead) begin
+                        bWriteEnable = 0;
+                    end
                 end
-
-                if (aCurrentAddress == (localK * M)-1) begin
-                    bWriteEnable = 1;
-                    aWriteEnable = 0;
-                end else begin
-                    bWriteEnable = 0;
-                    aWriteEnable = 1;
-                end
-
-
                 
             end 
                 memRead: begin
                 //memRead state
+                aWriteEnable = 0;
+                bWriteEnable = 0;
+
                 matrices_loaded = 1;
                 K = localK;
 
@@ -192,6 +189,7 @@ module input_mems #(
                             //MatrixB stuff
                             //If MatrixB is done reading, move onto the next state
                             if (bCurrentAddress == (localK * N)-1) begin
+                                AXIS_TREADY = 0;
                                 nextState = memRead;
                                 //bWriteEnable = 0;
                             end
