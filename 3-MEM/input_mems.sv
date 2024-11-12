@@ -98,7 +98,7 @@ module input_mems #(
                 matrices_loaded = 0;
                 aAddress = aCurrentAddress;
                 bAddress = bCurrentAddress;
-                if (localA == 1) begin
+                if (localA == 1 && AXIS_TVALID == 1) begin
                     aWriteEnable = 1;
                     bWriteEnable = 0;
                 end else begin
@@ -137,6 +137,10 @@ module input_mems #(
                 aAddress = A_read_addr;
                 bAddress = B_read_addr;
 
+                if (nextState == takeInFirst) begin
+                    matrices_loaded = 0;
+                end
+
             end
         endcase
 
@@ -153,7 +157,7 @@ module input_mems #(
             aCurrentAddress = 0;
             bCurrentAddress = 0;
             localA = 1; //Assume we always have to read in matrixA first
-            
+
         end else begin
 
         currentState = nextState;
