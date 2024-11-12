@@ -52,7 +52,7 @@ module input_mems #(
 
 
     //Named nets between the memory modules (Just to keep things organized)
-    logic[INW-1:0] aDataIn, bDataIn, aDataOut, bDataOut;
+    logic[INW-1:0] aDataIn, bDataIn;
     logic[A_ADDR_BITS-1:0] aAddress;
     logic[B_ADDR_BITS-1:0] bAddress;
     logic aWriteEnable, bWriteEnable;
@@ -71,22 +71,20 @@ module input_mems #(
     //Memory instantiation for both A and B
     memory #(INW,(2**A_ADDR_BITS)) matrixA(
         .data_in(aDataIn),
-        .data_out(aDataOut),
+        .data_out(A_data),
         .addr(aAddress),
         .clk(clk),
         .wr_en(aWriteEnable)
     );
     memory #(INW,(2**B_ADDR_BITS)) matrixB(
         .data_in(bDataIn),
-        .data_out(bDataOut),
+        .data_out(B_data),
         .addr(bAddress),
         .clk(clk),
         .wr_en(bWriteEnable)
     );
 
     always_comb begin
-        A_data = aDataOut;
-        B_data = bDataOut;
         //We'll send this to both memory registers and hope and pray that the FSM will handle the enables correctly
         aDataIn = AXIS_TDATA;
         bDataIn = AXIS_TDATA;
@@ -98,7 +96,7 @@ module input_mems #(
                 matrices_loaded = 0;
                 aAddress = aCurrentAddress;
                 bAddress = bCurrentAddress;
-                if (localA == 1 && AXIS_TVALID == 1) begin
+                if (localA == 1) begin
                     aWriteEnable = 1;
                     bWriteEnable = 0;
                 end else begin
@@ -234,6 +232,7 @@ module input_mems #(
                     //This state changes when compute_finished = 1 and moves the FSM back to waitForValid
                     if (compute_finished == 1) begin
                         nextState = takeInFirst;
+                        AXIS_TREADY = 1;
 
                         //Reset current addressing to 0 for both a and b
                         aCurrentAddress = 0;
