@@ -1,0 +1,6 @@
+Status report:
+0.75ns Fastest Clock time for both synthesis files
+
+We stalled out while trying to debug this part of the project. According to some of my peers, this may be due to my use of blocking statements within my always_ff instead of using non-blocking statements. I assumed that it wouldn't matter as long as you remain consistent throughout the always_ff. 
+The current code is reporting errors on all [0]s, no matter if it exists in matrixA or matrixB. That is: outside of the first load (When the system is placed in the reset state), index [0] will always report the wrong  value due to index 0 never being updated in any case. I am aware this has to do with the code at around lines 171. To solve this issue, I would change the aWriteEnable/bWriteEnable to 1 a clock cycle sooner than it already is in the always_comb block. However, I cannot think of a series of inputs that would allow us to do it. 
+Our block here does finish all test cases with 11469 errors.

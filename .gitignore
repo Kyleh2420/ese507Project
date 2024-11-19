@@ -14,3 +14,11 @@
 /3-MEM/wave.do
 /3-MEM/work/
 /3-MEM/.*
+/3-MEMV2/cds.lib
+/3-MEMV2/lib.defs
+/3-MEMV2/memory.sv
+/3-MEMV2/params.sv
+/3-MEMV2/transcript
+/3-MEMV2/vsim.wlf
+/3-MEMV2/work/
+/3-MEMV2/.*
