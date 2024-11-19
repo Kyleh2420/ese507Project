@@ -2,7 +2,7 @@
 //In this version, we've made sure to seperate out the datapath from the FSM Control path
 //Hopefully this makes debugging easier and works on the first try (Fat chance lol)
 
-//The FSM only has control over 4 things: aCurrentAddress, bCurrentAddress, currentState, nextState
+//The FSM only has control over 4 things: aCurrentAddress, bCurrentAddress, currentState, localK
 
 
 module memory #(
@@ -88,6 +88,9 @@ module input_mems #(
 
     //Datapath begin
     always_comb begin
+        //Output the stored value of K
+        //Doesn't need to be valid until currentState = memRead
+        K = localK;
 
         unique case (currentState)
                 takeInFirst: begin
@@ -141,7 +144,7 @@ module input_mems #(
                     aAddress = aCurrentAddress;
                     bAddress = bCurrentAddress; 
 
-                    //Copy the data into memory bank A if the data is valid
+                    //Copy the data into memory bank B if the data is valid
                     //Otherwise, don't copy anything
                     if (AXIS_TVALID == 1) begin
                         aWriteEnable = 0;   //Do not write into A
@@ -156,8 +159,8 @@ module input_mems #(
                     matrices_loaded = 1;    //Adjusted based on current state
                     AXIS_TREADY = 0;        //Adjusted based on current state
 
-                    //Output the stored value of K
-                    K = localK;
+                    //Originally, I had K output here. However, this created a latch. Thus, I've moved the K outside the case
+                    //K doesn't need to be valid until this point anyways, which it will be
 
                     //Memory bank address controlled by output logic
                     aAddress = A_read_addr;
@@ -246,8 +249,8 @@ module input_mems #(
                         currentState <= memRead;
                     end else begin
                         currentState <= takeInFirst;
-                        aCurrentAddress = 0;
-                        bCurrentAddress = 0;
+                        aCurrentAddress <= 0;
+                        bCurrentAddress <= 0;
                     end
                 end
             endcase
