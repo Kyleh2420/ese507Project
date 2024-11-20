@@ -129,6 +129,7 @@ module MMM #(
             end
             compute: begin
                 computeFinished <= 0;
+                currentState <= compute;    //State stays in compute, onless oetherwise noted
 
                 //The following should only be computed if we're not going to overwrite anything
                 if (fifoCapacity == 0) begin
@@ -175,10 +176,18 @@ module MMM #(
                         validInput <= 1;
 
                     end
+                end else begin
+                    currentState = stall;
                 end
             end
             stall: begin
-
+                if (fifoCapacity != 0) begin
+                    //fifo is no longer full. Go back to compute
+                    currentState <= compute;
+                end else begin
+                    //Fifo is still full. Remain in stall
+                    currentState <= stall;
+                end
             end
         endcase 
     end
