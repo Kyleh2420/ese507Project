@@ -1,4 +1,4 @@
-/1-MAC/*.swp
+index <= 0/1-MAC/*.swp
 /1-MAC/params.sv
 /1-MAC/transcript
 /1-MAC/vsim.wlf
@@ -22,3 +22,11 @@
 /3.1-MEM/vsim.wlf
 /3.1-MEM/work/
 /3.1-MEM/.*
+/4-MMM/cds.lib
+/4-MMM/lib.defs
+/4-MMM/memory.sv
+/4-MMM/params.sv
+/4-MMM/transcript
+/4-MMM/vsim.wlf
+/4-MMM/work/
+/4-MMM/.*

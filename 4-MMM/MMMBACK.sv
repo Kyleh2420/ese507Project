@@ -37,7 +37,7 @@ module MMM #(
     logic [$clog2(N+1)-1:0] fifoCapacity;
 
     //State Logic
-    enum {waitForLoad, compute, stall, stallCompute} currentState;
+    enum {waitForLoad, compute, stall} currentState;
 
     //Internal signals used to determine current status
     logic [K_BITS-1:0] index;
@@ -97,11 +97,6 @@ module MMM #(
                 aAddress = index + (outputRow * K);
                 bAddress = (index * K) + outputCol;
             end
-            stallCompute: begin
-                //This state is a do nothing state as well, stalling for 1 clock cycle while the MAC module finishes up the last compute
-                //This is because we pipelined it, so it takes 2 clock cycles for the data to be fully done
-
-            end
         endcase  
     end
 
@@ -152,26 +147,24 @@ module MMM #(
                                 currentState <= waitForLoad;
                                 fifoWriteEnable <= 1;
                                 computeFinished <= 1;
-
-
                             end else begin
                                 index <= 0;
                                 outputCol <= outputCol + 1;
                                 
                                 // I don't know if we need this here to remove an implied lach
                                 outputRow <= outputRow;
-
-                                //Wait one more clock cycle for the MAC unit to finish
-                            currentState <= stallCompute;
+                                fifoWriteEnable <= 1;
+                                clearAcc <= 1;
+                                validInput <= 1;
                             end
                         end else begin
                             //In here, we're not yet done computing the entire row (We're still computing some columns in the row.) Increment to the next column
                             index <= 0;
                             outputCol <= 0;
                             outputRow <= outputRow + 1;
-
-                            //Wait one more clock cycle for the MAC unit to finish
-                            currentState <= stallCompute;
+                            fifoWriteEnable <= 1;
+                            clearAcc <= 1;
+                            validInput <= 1;
 
                         end
                     end else begin
@@ -186,8 +179,6 @@ module MMM #(
                         clearAcc <= 0;
                         validInput <= 1;
 
-                        currentState <= compute;
-
                     end
                 end else begin
                     currentState <= stall;
@@ -201,14 +192,6 @@ module MMM #(
                     //Fifo is still full. Remain in stall
                     currentState <= stall;
                 end
-            end
-            stallCompute: begin
-                //The only purpose is to stall by a cycle. So send this right back to state compute
-                currentState <= compute;
-                //After the stall, we set clearAcc = 1
-                fifoWriteEnable <= 1;
-                clearAcc <= 1;
-                validInput <= 1;
             end
         endcase 
     end
