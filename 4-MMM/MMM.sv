@@ -174,15 +174,22 @@ module MMM #(
                 computeFinished <= 0;
                 currentState <= compute;    //State stays in compute, unless oetherwise noted
 
-                //The following should only be computed if we're not going to overwrite anything
-                if (fifoCapacity != 0) begin
-                    if (index == K-1) begin
-                        //In here, we are done computing the dot product (Incremented past all K values)
-                        //Thus, we should choose something to increment - either the column or the row
-                        if (outputCol == N-1) begin
-                            //In here, we're done computing the entire output row (done with all columns in a row). Increment to the next row, or check if we're finished with this computation
-                            if (outputRow == M-1) begin
-                                //In here, we're basically done computing the entire matrix. Set computeFinished to 1, move to waitForFinish for a response from the input_mems
+                if (index == K-1) begin
+                    //In here, we are done computing the dot product (Incremented past all K values)
+                    //Thus, we should choose something to increment - either the column or the row
+                    if (outputCol == N-1) begin
+                        //In here, we're done computing the entire output row (done with all columns in a row). Increment to the next row, or check if we're finished with this computation
+                        if (outputRow == M-1) begin
+                            //In here, we're basically done computing the entire matrix. Set computeFinished to 1, move to waitForFinish for a response from the input_mems
+
+                            //However, let's check if we can actually write to the fifo. If we can't jumpt the stall state and wait until we can write
+                            //We can write to the fifo if the capacity is not full OR it is not about to be full (We are going to write on this clock cycle)
+                            if (fifoCapacity == 0 || (fifoWriteEnable == 1 && fifoCapacity == 1)) begin
+                                //Fifo is full. Go to stall state and don't write anything
+                                currentState <= stall;
+
+                            end else begin
+                                //fifo is not full. Store as normal
                                 currentState <= waitForLoad;
 
                                 computeFinished <= 1;
@@ -192,8 +199,22 @@ module MMM #(
                                 fifoWriteEnableDelay2 <= 1;
                                 clearAccDelay2 <= 1;
                                 validDelay1 <= 0;
+
+                            end
+                            
+                        end else begin
+                            //We're not done computing the entire matrix. Increment the row, and proceed.
+
+                            //However, let's check if we can actually write to the fifo. If we can't jumpt the stall state and wait until we can write
+                            if (fifoCapacity == 0 || (fifoWriteEnable == 1 && fifoCapacity == 1)) begin
+                                //Fifo is full. Go to stall state and don't write anything
+                                currentState <= stall;
+
+
                             end else begin
-                                //We're not done computing the entire matrix. Increment the row, and proceed.
+                                //fifo is not full. Store as normal
+                                currentState <= compute;
+
                                 index <= 0;
                                 outputRow <= outputRow + 1;
                                 outputCol <= 0;
@@ -201,31 +222,42 @@ module MMM #(
                                 clearAccDelay2 <= 1;
                                 validDelay1 <= 1;
                             end
+
+                            
+                        end
+                    end else begin
+                        //In here, we're not yet done computing the entire row (We're still computing some columns in the row.) Increment to the next column
+
+                        //However, let's check if we can actually write to the fifo. If we can't jumpt the stall state and wait until we can write
+                        if (fifoCapacity == 0 || (fifoWriteEnable == 1 && fifoCapacity == 1)) begin
+                            //Fifo is full. Go to stall state and don't write anything
+                            currentState <= stall;
                         end else begin
-                            //In here, we're not yet done computing the entire row (We're still computing some columns in the row.) Increment to the next column
+                            //fifo is not full. Store as normal
+                            currentState <= compute;
+
                             index <= 0;
                             outputRow <= outputRow;
                             outputCol <= outputCol + 1;
                             fifoWriteEnableDelay2 <= 1;
                             clearAccDelay2 <= 1;
                             validDelay1 <= 1;
-
                         end
-                    end else begin
-                        //In here, we are not yet done computing the dot product. Increment index
-                        index <= index + 1;
-
-                        //The following may be necessary to rid an implied latch, but I'm not entirely sure right now
-                        //outputRow <= outputRow;
-                        //outputCol <= outputCol;
-
-                        fifoWriteEnableDelay2 <= 0;
-                        clearAccDelay2 <= 0;
-                        validDelay1 <= 1;
+                        
 
                     end
                 end else begin
-                    currentState <= stall;
+                    //In here, we are not yet done computing the dot product. Increment index
+                    index <= index + 1;
+
+                    //The following may be necessary to rid an implied latch, but I'm not entirely sure right now
+                    //outputRow <= outputRow;
+                    //outputCol <= outputCol;
+
+                    fifoWriteEnableDelay2 <= 0;
+                    clearAccDelay2 <= 0;
+                    validDelay1 <= 1;
+
                 end
             end
             stall: begin
@@ -235,19 +267,8 @@ module MMM #(
                 end else begin
                     //Fifo is still full. Remain in stall
                     currentState <= stall;
+                    validDelay1 <= 0;
                 end
-            end
-            waitForFinish: begin
-                if (matricesLoaded == 0) begin
-                    //In here, we've gotten a response from the MAC
-                    //Can return to waitForLoad
-                    currentState <= waitForLoad;
-                    computeFinished <= 0;
-                end else begin
-                    //We haven't gotten a response from the MAC yet. Continue waiting for a response
-                    currentState <= waitForFinish;
-                end 
-
             end
         endcase 
     end
