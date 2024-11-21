@@ -163,6 +163,8 @@ module MMM #(
                     currentState <= compute;
                     clearAccDelay2 <= 0;
                     //Confirmed no validDelay1 here. It should be 0, not 1 here.
+
+                    validDelay1 <= 1;
                 end else begin
                     currentState <= waitForLoad;
                 end
