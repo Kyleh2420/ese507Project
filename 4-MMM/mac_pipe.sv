@@ -30,7 +30,13 @@ module mac_pipe #(
 
 	//Add register sum and product
 	always_comb begin
-		sum = out + add1;
+		//Here I'm trying something
+		if (clear_acc == 1) begin
+			sum = add1;
+		end else begin
+			sum = out + add1;
+		end
+
 		//Complete the saturation detection here.
 		//If the signs of the two input match, we may have overflowed. 
 		//Further check if the sign has flipped in the sum. If the sign has flipped, then we have overflowed.
@@ -45,7 +51,7 @@ module mac_pipe #(
 	always_ff @ (posedge clk) begin
 
 		//If there is a reset or clear, set the output to 0
-		if ((clear_acc == 1) || (reset == 1)) begin
+		if ((reset == 1)) begin
 			out <= 0;
 		end
 		else begin

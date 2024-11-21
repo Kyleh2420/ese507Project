@@ -37,7 +37,7 @@ module MMM #(
     logic [$clog2(N+1)-1:0] fifoCapacity;
 
     //State Logic
-    enum {waitForLoad, compute, stall, stallCompute} currentState;
+    enum {waitForLoad, compute, stall} currentState;
 
     //Internal signals used to determine current status
     logic [K_BITS-1:0] index;
@@ -97,12 +97,38 @@ module MMM #(
                 aAddress = index + (outputRow * K);
                 bAddress = (index * K) + outputCol;
             end
-            stallCompute: begin
-                //This state is a do nothing state as well, stalling for 1 clock cycle while the MAC module finishes up the last compute
-                //This is because we pipelined it, so it takes 2 clock cycles for the data to be fully done
-
-            end
         endcase  
+    end
+
+    //Used to delay the clear accumulate signal by one additional clock
+    logic clearAccDelay1, clearAccDelay2, fifoWriteEnableDelay1, fifoWriteEnableDelay2;
+    always_ff @(posedge clk) begin : delayAccumulateClear
+
+        clearAcc <= clearAccDelay1;
+        clearAccDelay1 <= clearAccDelay2;
+        fifoWriteEnable <= fifoWriteEnableDelay1;
+        fifoWriteEnableDelay1 <= fifoWriteEnableDelay2;
+        
+    /*
+        //Default signals are 0
+        fifoWriteEnable <= 0;
+        clearAcc <= 0;
+        fifoWriteEnableDelay2 <= 0;
+
+        if (clearAccDelay2 == 1) begin
+            clearAcc <= clearAccDelay2;
+        end
+
+        //Also delay the write Enable signal by 1
+        if (fifoWriteEnableDelay1 == 1) begin
+            fifoWriteEnable <= 1;
+        end
+
+        //Also delay the write Enable signal by 1
+        if (fifoWriteEnableDelay1 == 1) begin
+            fifoWriteEnable <= 1;
+        end
+        */
     end
 
     //This entire thing could be made more effiient by writing the stalling when we're done computing, instead of as we're computing
@@ -123,13 +149,14 @@ module MMM #(
                 index <= 0;
                 outputRow <= 0;
                 outputCol <= 0;
-                fifoWriteEnable <= 0;
-                clearAcc <= 1;
+                fifoWriteEnableDelay2 <= 0;
+                clearAccDelay2 <= 1;
                 validInput <= 0;
 
                 //State control logic
                 if (matricesLoaded == 1) begin
                     currentState <= compute;
+                    clearAccDelay2 <= 0;
                     //Confirmed no validInput here. It should be 0, not 1 here.
                 end else begin
                     currentState <= waitForLoad;
@@ -150,28 +177,25 @@ module MMM #(
                             if (outputRow == M-1) begin
                                 //In here, we're basically done computing the entire matrix. Move back to the waitForLoad state and set computeFinished to 1
                                 currentState <= waitForLoad;
-                                fifoWriteEnable <= 1;
+                                fifoWriteEnableDelay2 <= 1;
                                 computeFinished <= 1;
-
-
                             end else begin
+                                //We're not done computing the entire matrix. Increment the row, and proceed.
                                 index <= 0;
-                                outputCol <= outputCol + 1;
-                                
-                                // I don't know if we need this here to remove an implied lach
-                                outputRow <= outputRow;
-
-                                //Wait one more clock cycle for the MAC unit to finish
-                            currentState <= stallCompute;
+                                outputRow <= outputRow + 1;
+                                outputCol <= 0;
+                                fifoWriteEnableDelay2 <= 1;
+                                clearAccDelay2 <= 1;
+                                validInput <= 1;
                             end
                         end else begin
                             //In here, we're not yet done computing the entire row (We're still computing some columns in the row.) Increment to the next column
                             index <= 0;
-                            outputCol <= 0;
-                            outputRow <= outputRow + 1;
-
-                            //Wait one more clock cycle for the MAC unit to finish
-                            currentState <= stallCompute;
+                            outputRow <= outputRow;
+                            outputCol <= outputCol + 1;
+                            fifoWriteEnableDelay2 <= 1;
+                            clearAccDelay2 <= 1;
+                            validInput <= 1;
 
                         end
                     end else begin
@@ -182,11 +206,9 @@ module MMM #(
                         //outputRow <= outputRow;
                         //outputCol <= outputCol;
 
-                        fifoWriteEnable <= 0;
-                        clearAcc <= 0;
+                        fifoWriteEnableDelay2 <= 0;
+                        clearAccDelay2 <= 0;
                         validInput <= 1;
-
-                        currentState <= compute;
 
                     end
                 end else begin
@@ -201,14 +223,6 @@ module MMM #(
                     //Fifo is still full. Remain in stall
                     currentState <= stall;
                 end
-            end
-            stallCompute: begin
-                //The only purpose is to stall by a cycle. So send this right back to state compute
-                currentState <= compute;
-                //After the stall, we set clearAcc = 1
-                fifoWriteEnable <= 1;
-                clearAcc <= 1;
-                validInput <= 1;
             end
         endcase 
     end
