@@ -37,7 +37,7 @@ module MMM #(
     logic [$clog2(N+1)-1:0] fifoCapacity;
 
     //State Logic
-    enum {waitForLoad, compute, stall} currentState;
+    enum {waitForLoad, compute, stall, waitForFinish} currentState;
 
     //Internal signals used to determine current status
     logic [K_BITS-1:0] index;
@@ -89,13 +89,17 @@ module MMM #(
             end
             compute: begin
                 aAddress = index + (outputRow * K);
-                bAddress = (index * K) + outputCol;
+                bAddress = (index * N) + outputCol;
             end
             stall: begin
                 //When we stall, the items here can remain the same. 
                 //We just set the valid_input line to 0 to signal the mac to not do anything
                 aAddress = index + (outputRow * K);
-                bAddress = (index * K) + outputCol;
+                bAddress = (index * N) + outputCol;
+            end
+            waitForFinish: begin
+                aAddress = 0;
+                bAddress = 0;
             end
         endcase  
     end
@@ -154,7 +158,7 @@ module MMM #(
                 validInput <= 0;
 
                 //State control logic
-                if (matricesLoaded == 1) begin
+                if (matricesLoaded == 1 && computeFinished == 0) begin
                     currentState <= compute;
                     clearAccDelay2 <= 0;
                     //Confirmed no validInput here. It should be 0, not 1 here.
@@ -165,7 +169,7 @@ module MMM #(
             end
             compute: begin
                 computeFinished <= 0;
-                currentState <= compute;    //State stays in compute, onless oetherwise noted
+                currentState <= compute;    //State stays in compute, unless oetherwise noted
 
                 //The following should only be computed if we're not going to overwrite anything
                 if (fifoCapacity != 0) begin
@@ -175,10 +179,16 @@ module MMM #(
                         if (outputCol == N-1) begin
                             //In here, we're done computing the entire output row (done with all columns in a row). Increment to the next row, or check if we're finished with this computation
                             if (outputRow == M-1) begin
-                                //In here, we're basically done computing the entire matrix. Move back to the waitForLoad state and set computeFinished to 1
+                                //In here, we're basically done computing the entire matrix. Set computeFinished to 1, move to waitForFinish for a response from the input_mems
                                 currentState <= waitForLoad;
-                                fifoWriteEnableDelay2 <= 1;
+
                                 computeFinished <= 1;
+                                index <= 0;
+                                outputRow <= 0;
+                                outputCol <= 0;
+                                fifoWriteEnableDelay2 <= 1;
+                                clearAccDelay2 <= 1;
+                                validInput <= 0;
                             end else begin
                                 //We're not done computing the entire matrix. Increment the row, and proceed.
                                 index <= 0;
@@ -223,6 +233,18 @@ module MMM #(
                     //Fifo is still full. Remain in stall
                     currentState <= stall;
                 end
+            end
+            waitForFinish: begin
+                if (matricesLoaded == 0) begin
+                    //In here, we've gotten a response from the MAC
+                    //Can return to waitForLoad
+                    currentState <= waitForLoad;
+                    computeFinished <= 0;
+                end else begin
+                    //We haven't gotten a response from the MAC yet. Continue waiting for a response
+                    currentState <= waitForFinish;
+                end 
+
             end
         endcase 
     end

@@ -21,6 +21,12 @@ add wave -noupdate -divider -height 25 {DATA OUT}
 add wave -noupdate -radix decimal /MMM_tb/dut/OUTPUT_TDATA
 add wave -noupdate /MMM_tb/dut/OUTPUT_TVALID
 add wave -noupdate /MMM_tb/dut/OUTPUT_TREADY
+add wave -noupdate -divider INPUT_MEMS
+add wave -noupdate /MMM_tb/dut/inputMem/aWriteEnable
+add wave -noupdate /MMM_tb/dut/inputMem/bWriteEnable
+add wave -noupdate -radix decimal -childformat {{{/MMM_tb/dut/inputMem/matrixA/mem[15]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[14]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[13]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[12]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[11]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[10]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[9]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[8]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[7]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[6]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[5]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[4]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[3]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[2]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[1]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixA/mem[0]} -radix decimal}} -expand -subitemconfig {{/MMM_tb/dut/inputMem/matrixA/mem[15]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[14]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[13]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[12]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[11]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[10]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[9]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[8]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[7]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[6]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[5]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[4]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[3]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[2]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[1]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixA/mem[0]} {-radix decimal}} /MMM_tb/dut/inputMem/matrixA/mem
+add wave -noupdate -radix decimal -childformat {{{/MMM_tb/dut/inputMem/matrixB/mem[15]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[14]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[13]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[12]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[11]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[10]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[9]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[8]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[7]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[6]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[5]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[4]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[3]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[2]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[1]} -radix decimal} {{/MMM_tb/dut/inputMem/matrixB/mem[0]} -radix decimal}} -subitemconfig {{/MMM_tb/dut/inputMem/matrixB/mem[15]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[14]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[13]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[12]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[11]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[10]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[9]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[8]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[7]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[6]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[5]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[4]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[3]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[2]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[1]} {-radix decimal} {/MMM_tb/dut/inputMem/matrixB/mem[0]} {-radix decimal}} /MMM_tb/dut/inputMem/matrixB/mem
+add wave -noupdate /MMM_tb/dut/inputMem/newA
 add wave -noupdate -divider {ADDRESSING & DATA}
 add wave -noupdate /MMM_tb/dut/aAddress
 add wave -noupdate /MMM_tb/dut/bAddress
@@ -32,7 +38,6 @@ add wave -noupdate -radix decimal /MMM_tb/dut/mac/add1
 add wave -noupdate -radix decimal /MMM_tb/dut/mac/sum
 add wave -noupdate -radix decimal /MMM_tb/dut/macOut
 add wave -noupdate -radix decimal /MMM_tb/dut/clearAcc
-add wave -noupdate -radix decimal /MMM_tb/dut/mac/clear_acc
 add wave -noupdate -divider -height 25 {OTHER DATA}
 add wave -noupdate /MMM_tb/dut/matricesLoaded
 add wave -noupdate /MMM_tb/dut/computeFinished
@@ -43,7 +48,7 @@ add wave -noupdate /MMM_tb/dut/index
 add wave -noupdate /MMM_tb/dut/outputCol
 add wave -noupdate /MMM_tb/dut/outputRow
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {255 ns} 0}
+WaveRestoreCursors {{Cursor 1} {915 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 335
 configure wave -valuecolwidth 100
@@ -59,4 +64,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {146 ns} {408 ns}
+WaveRestoreZoom {816 ns} {1046 ns}
