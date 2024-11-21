@@ -105,13 +105,14 @@ module MMM #(
     end
 
     //Used to delay the clear accumulate signal by one additional clock
-    logic clearAccDelay1, clearAccDelay2, fifoWriteEnableDelay1, fifoWriteEnableDelay2;
+    logic clearAccDelay1, clearAccDelay2, fifoWriteEnableDelay1, fifoWriteEnableDelay2, validDelay1;
     always_ff @(posedge clk) begin : delayAccumulateClear
 
         clearAcc <= clearAccDelay1;
         clearAccDelay1 <= clearAccDelay2;
         fifoWriteEnable <= fifoWriteEnableDelay1;
         fifoWriteEnableDelay1 <= fifoWriteEnableDelay2;
+        validInput <= validDelay1;
         
     /*
         //Default signals are 0
@@ -155,13 +156,13 @@ module MMM #(
                 outputCol <= 0;
                 fifoWriteEnableDelay2 <= 0;
                 clearAccDelay2 <= 1;
-                validInput <= 0;
+                validDelay1 <= 0;
 
                 //State control logic
                 if (matricesLoaded == 1 && computeFinished == 0) begin
                     currentState <= compute;
                     clearAccDelay2 <= 0;
-                    //Confirmed no validInput here. It should be 0, not 1 here.
+                    //Confirmed no validDelay1 here. It should be 0, not 1 here.
                 end else begin
                     currentState <= waitForLoad;
                 end
@@ -188,7 +189,7 @@ module MMM #(
                                 outputCol <= 0;
                                 fifoWriteEnableDelay2 <= 1;
                                 clearAccDelay2 <= 1;
-                                validInput <= 0;
+                                validDelay1 <= 0;
                             end else begin
                                 //We're not done computing the entire matrix. Increment the row, and proceed.
                                 index <= 0;
@@ -196,7 +197,7 @@ module MMM #(
                                 outputCol <= 0;
                                 fifoWriteEnableDelay2 <= 1;
                                 clearAccDelay2 <= 1;
-                                validInput <= 1;
+                                validDelay1 <= 1;
                             end
                         end else begin
                             //In here, we're not yet done computing the entire row (We're still computing some columns in the row.) Increment to the next column
@@ -205,7 +206,7 @@ module MMM #(
                             outputCol <= outputCol + 1;
                             fifoWriteEnableDelay2 <= 1;
                             clearAccDelay2 <= 1;
-                            validInput <= 1;
+                            validDelay1 <= 1;
 
                         end
                     end else begin
@@ -218,7 +219,7 @@ module MMM #(
 
                         fifoWriteEnableDelay2 <= 0;
                         clearAccDelay2 <= 0;
-                        validInput <= 1;
+                        validDelay1 <= 1;
 
                     end
                 end else begin
