@@ -4,11 +4,11 @@
 MODULE ?= tbench
 
 #Defaults for simParams and genParams
-INW ?= 12
-OUTW ?= 36
-M ?= 6
-N ?= 11
-MAXK ?= 8
+INW ?= 3
+OUTW ?= 8
+M ?= 3
+N ?= 3
+MAXK ?= 3
 TVALID_PROB ?= .5
 TREADY_PROB ?= .5
 GUI ?= 0

@@ -184,7 +184,7 @@ module MMM #(
 
                             //However, let's check if we can actually write to the fifo. If we can't jumpt the stall state and wait until we can write
                             //We can write to the fifo if the capacity is not full OR it is not about to be full (We are going to write on this clock cycle)
-                            if (fifoCapacity == 0 || (fifoWriteEnable == 1 && fifoCapacity == 1)) begin
+                            if (fifoCapacity == 0 || ((fifoWriteEnable == 1 || fifoWriteEnableDelay1 == 1) && fifoCapacity == 1)) begin
                                 //Fifo is full. Go to stall state and don't write anything
                                 currentState <= stall;
 
@@ -206,7 +206,7 @@ module MMM #(
                             //We're not done computing the entire matrix. Increment the row, and proceed.
 
                             //However, let's check if we can actually write to the fifo. If we can't jumpt the stall state and wait until we can write
-                            if (fifoCapacity == 0 || (fifoWriteEnable == 1 && fifoCapacity == 1)) begin
+                            if (fifoCapacity == 0 || ((fifoWriteEnable == 1 || fifoWriteEnableDelay1 == 1) && fifoCapacity == 1)) begin
                                 //Fifo is full. Go to stall state and don't write anything
                                 currentState <= stall;
 
@@ -229,7 +229,7 @@ module MMM #(
                         //In here, we're not yet done computing the entire row (We're still computing some columns in the row.) Increment to the next column
 
                         //However, let's check if we can actually write to the fifo. If we can't jumpt the stall state and wait until we can write
-                        if (fifoCapacity == 0 || (fifoWriteEnable == 1 && fifoCapacity == 1)) begin
+                        if (fifoCapacity == 0 || ((fifoWriteEnable == 1 || fifoWriteEnableDelay1 == 1) && fifoCapacity == 1)) begin
                             //Fifo is full. Go to stall state and don't write anything
                             currentState <= stall;
                         end else begin
