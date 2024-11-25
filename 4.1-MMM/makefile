@@ -10,7 +10,7 @@ M ?= 3
 N ?= 3
 MAXK ?= 3
 TVALID_PROB ?= 1
-TREADY_PROB ?= .5
+TREADY_PROB ?= .1
 GUI ?= 0
 
 # Default target when running 'make'

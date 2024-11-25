@@ -81,6 +81,17 @@ module MMM #(
         .AXIS_TREADY(OUTPUT_TREADY)
     );
 
+    //Used to delay the clear accumulate signal by one additional clock
+    logic clearAccDelay1, clearAccDelay2, fifoWriteEnableDelay1, fifoWriteEnableDelay2, validDelay1;
+    always_ff @(posedge clk) begin : delayAccumulateClear
+
+        clearAcc <= clearAccDelay1;
+        clearAccDelay1 <= clearAccDelay2;
+        fifoWriteEnable <= fifoWriteEnableDelay1;
+        fifoWriteEnableDelay1 <= fifoWriteEnableDelay2;
+        // validInput <= validDelay1;
+    end
+
     //Datapath stuff
     always_comb begin: dataPath
         case (currentState)
@@ -114,19 +125,20 @@ module MMM #(
             end
             compute: begin
                 //As long as we can write to the outputFIFO, continue computing. Unless it is full, then move to state stall
-                if (fifoCapacity > 0) begin
+                //We also count as full if the capacity is 1 and we're about to write to the fifo (Check fifoWriteDelay and fifoWriteDelay1)
+                if (fifoCapacity == 0 || ((fifoWriteEnable == 1 || fifoWriteEnableDelay1 == 1) && fifoCapacity == 1)) begin
+                    //There is no space in the fifo -- stall
+                    nextState <= stall;
+                end else begin
                     if (computeFinished) begin
                         nextState <= waitForLoad;
                     end else begin
                         nextState <= compute;
                     end
-                end else begin
-                    //There is no space in the fifo -- stall
-                    nextState <= stall;
                 end
             end
             stall: begin
-                if (fifoCapacity == 0) begin
+                if (fifoCapacity == 0 || ((fifoWriteEnable == 1 || fifoWriteEnableDelay1 == 1) && fifoCapacity == 1)) begin
                     //Fifo is full -- continue stalling
                     nextState <= stall;
                 end else begin
@@ -136,17 +148,6 @@ module MMM #(
             end
             endcase
         end
-    end
-
-    //Used to delay the clear accumulate signal by one additional clock
-    logic clearAccDelay1, clearAccDelay2, fifoWriteEnableDelay1, fifoWriteEnableDelay2, validDelay1;
-    always_ff @(posedge clk) begin : delayAccumulateClear
-
-        clearAcc <= clearAccDelay1;
-        clearAccDelay1 <= clearAccDelay2;
-        fifoWriteEnable <= fifoWriteEnableDelay1;
-        fifoWriteEnableDelay1 <= fifoWriteEnableDelay2;
-        // validInput <= validDelay1;
     end
 
     always_ff @( posedge clk ) begin : controlSignals
@@ -177,10 +178,7 @@ module MMM #(
                         //In this block, we are done computing the entire output row. Increment to the next row, or check if we're done with the computation alltogether
                         if (outputRow == M-1) begin
                             //In this block, we're done computing the entire matrix. move to waitForFinish to ensure a response form input_mems
-                            computeFinished <= 1;
-                            fifoWriteEnableDelay2 <= 1;
-                            clearAccDelay2 <= 1;
-                            validInput <= 1;
+                            
 
                             //If the next state is waitForLoad, then this has been acknowleged. Drop computeFinished back to 0
                             if (nextState == waitForLoad) begin
@@ -188,25 +186,38 @@ module MMM #(
                                 fifoWriteEnableDelay2 <= 0;
                                 clearAccDelay2 <= 0;
                                 validInput <= 0;
+                            end else if (nextState != stall) begin
+                                //In addition, check to make sure we're not going to stall out 
+                                computeFinished <= 1;
+                                fifoWriteEnableDelay2 <= 1;
+                                clearAccDelay2 <= 1;
+                                validInput <= 1;
                             end
                         end else begin
                             //In this block, we're not done computing the matrix. Increment to the next row
+
+                            //if nextState == stall, dont' do anything. Otherwise, continue as normal
+                            if (nextState != stall) begin
+                                index <= 0;
+                                outputRow <= outputRow + 1;
+                                outputCol <= 0;
+                                fifoWriteEnableDelay2 <= 1;
+                                clearAccDelay2 <= 1;
+                                validInput <= 1;
+                            end
+                        end
+                    end else begin
+                        //In this block, we're not yet done computing the output row. Increment outputCol.
+
+                        //If nextState == stall, don't do anything. Otherwise, continue as normal
+                        if (nextState != stall) begin
                             index <= 0;
-                            outputRow <= outputRow + 1;
-                            outputCol <= 0;
+                            outputRow <= outputRow;
+                            outputCol <= outputCol + 1;
                             fifoWriteEnableDelay2 <= 1;
                             clearAccDelay2 <= 1;
                             validInput <= 1;
                         end
-                    end else begin
-                        //In this block, we're not yet done computing the output row. Increment outputCol.
-                        
-                        index <= 0;
-                        outputRow <= outputRow;
-                        outputCol <= outputCol + 1;
-                        fifoWriteEnableDelay2 <= 1;
-                        clearAccDelay2 <= 1;
-                        validInput <= 1;
                     end
                 end else begin
                     //Dot product is not done computing. Increment K and continue going.
