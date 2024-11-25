@@ -30,3 +30,11 @@ index <= 0/1-MAC/*.swp
 /4-MMM/vsim.wlf
 /4-MMM/work/
 /4-MMM/.*
+/4.1-MMM/cds.lib
+/4.1-MMM/lib.defs
+/4.1-MMM/memory.sv
+/4.1-MMM/params.sv
+/4.1-MMM/transcript
+/4.1-MMM/vsim.wlf
+/4.1-MMM/work/
+/4.1-MMM/.*
