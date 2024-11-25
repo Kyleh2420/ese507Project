@@ -115,16 +115,8 @@ module MMM #(
             compute: begin
                 //As long as we can write to the outputFIFO, continue computing. Unless it is full, then move to state stall
                 if (fifoCapacity > 0) begin
-                    if (index == K-1 && outputCol == N-1 && outputRow == M-1) begin
-                        //We are finished with all calculations
-
-                        //However, we should wait for the input_mems to acknowledge this state with matrices_loaded going back to 0
-                        if (matricesLoaded == 0) begin
-                            nextState <= waitForLoad;
-                        end else begin
-                            nextState <= compute;
-                        end
-                        
+                    if (computeFinished) begin
+                        nextState <= waitForLoad;
                     end else begin
                         nextState <= compute;
                     end
@@ -175,6 +167,7 @@ module MMM #(
                 index <= 0;
                 outputCol <= 0;
                 outputRow <= 0;
+                computeFinished <= 0;
             end
             compute: begin
                 if (index == K-1) begin
@@ -188,6 +181,14 @@ module MMM #(
                             fifoWriteEnableDelay2 <= 1;
                             clearAccDelay2 <= 1;
                             validInput <= 1;
+
+                            //If the next state is waitForLoad, then this has been acknowleged. Drop computeFinished back to 0
+                            if (nextState == waitForLoad) begin
+                                computeFinished <= 0;
+                                fifoWriteEnableDelay2 <= 0;
+                                clearAccDelay2 <= 0;
+                                validInput <= 0;
+                            end
                         end else begin
                             //In this block, we're not done computing the matrix. Increment to the next row
                             index <= 0;
