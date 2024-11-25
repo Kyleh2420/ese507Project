@@ -1,0 +1,817 @@
+
+                           Design Compiler Graphical 
+                                 DC Ultra (TM)
+                                  DFTMAX (TM)
+                              Power Compiler (TM)
+                                 DesignWare (R)
+                                 DC Expert (TM)
+                               Design Vision (TM)
+                               HDL Compiler (TM)
+                               VHDL Compiler (TM)
+                                  DFT Compiler
+                               Design Compiler(R)
+
+              Version U-2022.12-SP7-2 for linux64 - Jan 30, 2024 
+
+                    Copyright (c) 1988 - 2024 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+Initializing...
+Current time:       Mon Nov 25 09:40:34 2024
+Hostname:           lab22.ece.stonybrook.edu
+CPU Model:          13th Gen Intel(R) Core(TM) i7-13700
+CPU Details:        Cores = 24 : Sockets = 1 : Cache Size = 30720 KB : Freq = 2.20 GHz
+OS:                 Linux 4.18.0-553.8.1.el8_10.x86_64
+RAM:                 30 GB (Free   4 GB)
+Swap:                15 GB (Free  14 GB)
+Work Filesystem:    /home/home5 mounted to files:/export/home5
+Tmp Filesystem:     / mounted to /dev/mapper/rhel-root
+Work Disk:          3475 GB (Free 980 GB)
+Tmp Disk:           786 GB (Free 283 GB)
+
+CPU Load: 6%, Ram Free: 4 GB, Swap Free: 14 GB, Work Disk Free: 980 GB, Tmp Disk Free: 283 GB
+##############################################
+# Setup: fill out the following parameters: name of clock signal, clock period (ns),
+# reset signal name (if used), name of top-level module, name of source file
+set CLK_NAME "clk";
+clk
+set CLK_PERIOD 1.15;
+1.15
+set RST_NAME "reset";
+reset
+set TOP_MOD_NAME "MMM";
+MMM
+set SRC_FILE [list "MMM.sv" "input_mems.sv" "mac_pipe.sv" "fifo_out.sv"];
+MMM.sv input_mems.sv mac_pipe.sv fifo_out.sv
+# If you have multiple source files, change the line above to list them all like this:
+# set SRC_FILE [list "file1.sv" "file2.sv"];
+###############################################
+# setup
+source setupdc.tcl
+NangateOpenCellLibrary_typical.db dw_foundation.sldb
+file mkdir work_synth
+date
+Mon Nov 25 09:40:34 2024
+pid
+292935
+pwd
+/home/home5/khan/ese507/ese507Project/4.1-MMM
+getenv USER
+khan
+getenv HOSTNAME
+Error: can't read "::env(HOSTNAME)": no such variable
+	Use error_info for more info. (CMD-013)
+# optimize FSMs
+set fsm_auto_inferring "true"; 
+true
+set fsm_enable_state_minimization "true";
+true
+define_design_lib WORK -path work_synth
+1
+analyze $SRC_FILE -format sverilog
+Running PRESTO HDLC
+Compiling source file ./MMM.sv
+Warning:  ./MMM.sv:40: Using default enum base size of 32. (VER-533)
+Compiling source file ./input_mems.sv
+Warning:  ./input_mems.sv:58: Using default enum base size of 32. (VER-533)
+Compiling source file ./mac_pipe.sv
+Compiling source file ./fifo_out.sv
+Presto compilation completed successfully.
+Loading db file '/home/home4/pmilder/ese507/synthesis/lib/NangateOpenCellLibrary_typical.db'
+Loading db file '/usr/local/synopsys/syn/U-2022.12-SP7-2/libraries/syn/dw_foundation.sldb'
+1
+elaborate -work WORK $TOP_MOD_NAME
+Loading db file '/usr/local/synopsys/syn/U-2022.12-SP7-2/libraries/syn/gtech.db'
+Loading db file '/usr/local/synopsys/syn/U-2022.12-SP7-2/libraries/syn/standard.sldb'
+  Loading link library 'NangateOpenCellLibrary'
+  Loading link library 'gtech'
+Running PRESTO HDLC
+Warning:  ./MMM.sv:189: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./MMM.sv:187: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./MMM.sv:98: signed to unsigned part selection occurs. (VER-318)
+Warning:  ./MMM.sv:124: signed to unsigned part selection occurs. (VER-318)
+Warning:  ./MMM.sv:176: signed to unsigned part selection occurs. (VER-318)
+
+Statistics for case statements in always block at line 96 in file
+	'./MMM.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|            98            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 120 in file
+	'./MMM.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           124            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 163 in file
+	'./MMM.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           176            |     no/auto      |
+===============================================
+
+Inferred memory devices in process
+	in routine MMM line 86 in file
+		'./MMM.sv'.
+=====================================================================================
+|       Register Name       |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+=====================================================================================
+|       clearAcc_reg        | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|    clearAccDelay1_reg     | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|    fifoWriteEnable_reg    | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+| fifoWriteEnableDelay1_reg | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+=====================================================================================
+
+Inferred memory devices in process
+	in routine MMM line 163 in file
+		'./MMM.sv'.
+=====================================================================================
+|       Register Name       |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+=====================================================================================
+|      validInput_reg       | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|     currentState_reg      | Flip-flop |  32   |  Y  | N  | N  | N  | N  | N  | N  |
+|    computeFinished_reg    | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|         index_reg         | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+|       outputRow_reg       | Flip-flop |   7   |  Y  | N  | N  | N  | N  | N  | N  |
+|       outputCol_reg       | Flip-flop |   9   |  Y  | N  | N  | N  | N  | N  | N  |
+| fifoWriteEnableDelay2_reg | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|    clearAccDelay2_reg     | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+=====================================================================================
+Presto compilation completed successfully. (MMM)
+Elaborated 1 design.
+Current design is now 'MMM'.
+Information: Building the design 'input_mems' instantiated from design 'MMM' with
+	the parameters "12,7,9,8". (HDL-193)
+
+Statistics for case statements in always block at line 90 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|            95            |    user/user     |
+===============================================
+
+Statistics for case statements in always block at line 179 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           188            |    user/user     |
+===============================================
+
+Inferred memory devices in process
+	in routine input_mems_INW12_M7_N9_MAXK8 line 179 in file
+		'./input_mems.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|     localK_reg      | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+|  currentState_reg   | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+| aCurrentAddress_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+| bCurrentAddress_reg | Flip-flop |   7   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully. (input_mems_INW12_M7_N9_MAXK8)
+Information: Building the design 'mac_pipe' instantiated from design 'MMM' with
+	the parameters "12,32". (HDL-193)
+
+Inferred memory devices in process
+	in routine mac_pipe_INW12_OUTW32 line 21 in file
+		'./mac_pipe.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|      add1_reg       | Flip-flop |  24   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+
+Inferred memory devices in process
+	in routine mac_pipe_INW12_OUTW32 line 51 in file
+		'./mac_pipe.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|       out_reg       | Flip-flop |  32   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully. (mac_pipe_INW12_OUTW32)
+Information: Building the design 'fifo_out' instantiated from design 'MMM' with
+	the parameters "32,9". (HDL-193)
+Warning:  ./fifo_out.sv:47: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./fifo_out.sv:58: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./fifo_out.sv:72: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./fifo_out.sv:82: signed to unsigned assignment occurs. (VER-318)
+
+Inferred memory devices in process
+	in routine fifo_out_OUTW32_DEPTH9 line 41 in file
+		'./fifo_out.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|     wr_addr_reg     | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+
+Inferred memory devices in process
+	in routine fifo_out_OUTW32_DEPTH9 line 66 in file
+		'./fifo_out.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|      tail_reg       | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+
+Inferred memory devices in process
+	in routine fifo_out_OUTW32_DEPTH9 line 86 in file
+		'./fifo_out.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|    capacity_reg     | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully. (fifo_out_OUTW32_DEPTH9)
+Information: Building the design 'memory' instantiated from design 'input_mems_INW12_M7_N9_MAXK8' with
+	the parameters "12,@28206b3a32393020743a2028206b3a31373820743a31333a22696e74254e624d764f26262220693a20693a3220292028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a36202920292000@". (HDL-193)
+
+Inferred memory devices in process
+	in routine memory_WIDTH12_SIZE64 line 19 in file
+		'./input_mems.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|    data_out_reg     | Flip-flop |  12   |  Y  | N  | N  | N  | N  | N  | N  |
+|       mem_reg       | Flip-flop |  768  |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Statistics for MUX_OPs
+==============================================================
+|     block name/line      | Inputs | Outputs | # sel inputs |
+==============================================================
+| memory_WIDTH12_SIZE64/20 |   64   |   12    |      6       |
+==============================================================
+Presto compilation completed successfully. (memory_WIDTH12_SIZE64)
+Information: Building the design 'memory' instantiated from design 'input_mems_INW12_M7_N9_MAXK8' with
+	the parameters "12,@28206b3a32393020743a2028206b3a31373820743a31333a22696e74254e624d764f26262220693a20693a3220292028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a37202920292000@". (HDL-193)
+
+Inferred memory devices in process
+	in routine memory_WIDTH12_SIZE128 line 19 in file
+		'./input_mems.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|    data_out_reg     | Flip-flop |  12   |  Y  | N  | N  | N  | N  | N  | N  |
+|       mem_reg       | Flip-flop | 1536  |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Statistics for MUX_OPs
+===============================================================
+|     block name/line       | Inputs | Outputs | # sel inputs |
+===============================================================
+| memory_WIDTH12_SIZE128/20 |  128   |   12    |      7       |
+===============================================================
+Presto compilation completed successfully. (memory_WIDTH12_SIZE128)
+Information: Building the design 'memory_dual_port' instantiated from design 'fifo_out_OUTW32_DEPTH9' with
+	the parameters "32,9". (HDL-193)
+
+Inferred memory devices in process
+	in routine memory_dual_port_WIDTH32_SIZE9 line 12 in file
+		'./fifo_out.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|    data_out_reg     | Flip-flop |  32   |  Y  | N  | N  | N  | N  | N  | N  |
+|       mem_reg       | Flip-flop |  288  |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully. (memory_dual_port_WIDTH32_SIZE9)
+1
+###### CLOCKS AND PORTS #######
+set CLK_PORT [get_ports $CLK_NAME]
+{clk}
+set TMP1 [remove_from_collection [all_inputs] $CLK_PORT]
+{reset INPUT_TDATA[11] INPUT_TDATA[10] INPUT_TDATA[9] INPUT_TDATA[8] INPUT_TDATA[7] INPUT_TDATA[6] INPUT_TDATA[5] INPUT_TDATA[4] INPUT_TDATA[3] INPUT_TDATA[2] INPUT_TDATA[1] INPUT_TDATA[0] INPUT_TVALID INPUT_TUSER[4] INPUT_TUSER[3] INPUT_TUSER[2] INPUT_TUSER[1] INPUT_TUSER[0] OUTPUT_TREADY}
+set INPUTS [remove_from_collection $TMP1 $RST_NAME]
+{INPUT_TDATA[11] INPUT_TDATA[10] INPUT_TDATA[9] INPUT_TDATA[8] INPUT_TDATA[7] INPUT_TDATA[6] INPUT_TDATA[5] INPUT_TDATA[4] INPUT_TDATA[3] INPUT_TDATA[2] INPUT_TDATA[1] INPUT_TDATA[0] INPUT_TVALID INPUT_TUSER[4] INPUT_TUSER[3] INPUT_TUSER[2] INPUT_TUSER[1] INPUT_TUSER[0] OUTPUT_TREADY}
+create_clock -period $CLK_PERIOD $CLK_PORT
+1
+set_input_delay 0.08 -max -clock $CLK_NAME $INPUTS
+1
+set_output_delay 0.08 -max -clock $CLK_NAME [all_outputs]
+1
+###### OPTIMIZATION #######
+set_max_area 0 
+1
+###### RUN #####
+compile_ultra
+Information: Performing leakage power optimization. (PWR-850)
+CPU Load: 6%, Ram Free: 4 GB, Swap Free: 14 GB, Work Disk Free: 980 GB, Tmp Disk Free: 283 GB
+Alib files are up-to-date.
+Information: Evaluating DesignWare library utilization. (UISN-27)
+
+============================================================================
+| DesignWare Building Block Library  |         Version         | Available |
+============================================================================
+| Basic DW Building Blocks           | U-2022.12-DWBB_202212.5 |     *     |
+| Licensed DW Building Blocks        | U-2022.12-DWBB_202212.5 |     *     |
+============================================================================
+
+====================================================================================================
+| Flow Information                                                                                 |
+----------------------------------------------------------------------------------------------------
+| Flow         | Design Compiler WLM                                                               |
+| Command Line | compile_ultra                                                                     |
+====================================================================================================
+| Design Information                                      | Value                                  |
+====================================================================================================
+| Number of Scenarios                                     | 0                                      |
+| Leaf Cell Count                                         | 3666                                   |
+| Number of User Hierarchies                              | 6                                      |
+| Sequential Cell Count                                   | 2795                                   |
+| Macro Count                                             | 0                                      |
+| Number of Power Domains                                 | 0                                      |
+| Number of Path Groups                                   | 2                                      |
+| Number of VT Class                                      | 0                                      |
+| Number of Clocks                                        | 1                                      |
+| Number of Dont Touch Cells                              | 186                                    |
+| Number of Dont Touch Nets                               | 0                                      |
+| Number of Size Only Cells                               | 0                                      |
+| Design with UPF Data                                    | false                                  |
+====================================================================================================
+Information: Sequential output inversion is enabled.  SVF file must be used for formal verification. (OPT-1208)
+
+Information: There are 16 potential problems in your design. Please run 'check_design' for more information. (LINT-99)
+
+  Simplifying Design 'MMM'
+
+Loaded alib file './alib-52/NangateOpenCellLibrary_typical.db.alib'
+  Building model 'DW01_NAND2'
+Information: Ungrouping hierarchy inputMem before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy mac before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy fifo before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy inputMem/matrixA before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy fifo/myMemInst before Pass 1 (OPT-776)
+Information: Ungrouping 5 of 7 hierarchies before Pass 1 (OPT-775)
+CPU Load: 6%, Ram Free: 4 GB, Swap Free: 14 GB, Work Disk Free: 980 GB, Tmp Disk Free: 283 GB
+Information: State dependent leakage is now switched from on to off.
+
+  Beginning Pass 1 Mapping
+  ------------------------
+  Processing 'memory_WIDTH12_SIZE128'
+  Processing 'MMM'
+Information: Added key list 'DesignWare' to design 'MMM'. (DDB-72)
+Information: The finite state machine currentState_reg has been extracted. (FSM_EX-144)
+Design : MMM
+Filename : /home/home5/khan/ese507/ese507Project/4.1-MMM/MMM.sv
+Clock             : clk        
+Asynchronous Reset: Unspecified
+
+
+Current Encoding (length/style)     : 32 / NONE
+State Vector: { currentState_reg[31] currentState_reg[30] currentState_reg[29] currentState_reg[28] currentState_reg[27] currentState_reg[26] currentState_reg[25] currentState_reg[24] currentState_reg[23] currentState_reg[22] currentState_reg[21] currentState_reg[20] currentState_reg[19] currentState_reg[18] currentState_reg[17] currentState_reg[16] currentState_reg[15] currentState_reg[14] currentState_reg[13] currentState_reg[12] currentState_reg[11] currentState_reg[10] currentState_reg[9] currentState_reg[8] currentState_reg[7] currentState_reg[6] currentState_reg[5] currentState_reg[4] currentState_reg[3] currentState_reg[2] currentState_reg[1] currentState_reg[0] }
+
+
+FSM_COMPLETE : FALSE
+Re-Encoding style     : NONE
+
+
+State Encodings and Order: 
+
+waitForLoad : 00000000000000000000000000000000
+compute    : 00000000000000000000000000000001
+stall      : 00000000000000000000000000000010
+Default Next State : waitForLoad
+
+Information: In design 'MMM', the register 'fifoWriteEnableDelay2_reg' is removed because it is merged to 'clearAccDelay2_reg'. (OPT-1215)
+Information: The register 'currentState_reg[31]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[30]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[29]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[28]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[27]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[26]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[25]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[24]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[23]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[22]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[21]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[20]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[19]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[18]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[17]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[16]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[15]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[14]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[13]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[12]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[11]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[10]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[9]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[8]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[7]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[6]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[5]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[4]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[3]' will be removed. (OPT-1207)
+Information: The register 'currentState_reg[2]' will be removed. (OPT-1207)
+ Implement Synthetic for 'MMM'.
+Information: Command 'do_operand_isolation' is obsolete and is being ignored.  Please refer to the replacement command 'set power_enable_datapath_gating true' instead. (INFO-118)
+CPU Load: 7%, Ram Free: 4 GB, Swap Free: 14 GB, Work Disk Free: 980 GB, Tmp Disk Free: 283 GB
+
+  Updating timing information
+Information: Updating design information... (UID-85)
+Information: In design 'MMM', the register 'fifoWriteEnableDelay1_reg' is removed because it is merged to 'clearAccDelay1_reg'. (OPT-1215)
+
+  Beginning Mapping Optimizations  (Ultra High effort)
+  -------------------------------
+Information: Ungrouping hierarchy inputMem/matrixB/C3250 'memory_WIDTH12_SIZE128_MUX_OP_128_7_12' #insts = 1121. (OPT-777)
+  Mapping Optimization (Phase 1)
+  Mapping Optimization (Phase 2)
+Information: In design 'MMM', the register 'fifoWriteEnable_reg' is removed because it is merged to 'clearAcc_reg'. (OPT-1215)
+Information: Command 'do_operand_isolation' is obsolete and is being ignored.  Please refer to the replacement command 'set power_enable_datapath_gating true' instead. (INFO-118)
+
+                                  TOTAL                                                
+   ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
+  --------- --------- --------- --------- --------- ------------------------- ---------
+    0:00:18   30445.6      0.47     963.9     488.8                           859214.1875
+    0:00:18   30411.5      0.58     974.4     487.8                           858216.4375
+
+  Beginning Constant Register Removal
+  -----------------------------------
+    0:00:18   30532.0      0.87    1031.9     487.8                           864704.2500
+    0:00:18   30532.0      0.87    1031.9     487.8                           864704.2500
+
+  Beginning Global Optimizations
+  ------------------------------
+  Numerical Synthesis (Phase 1)
+  Numerical Synthesis (Phase 2)
+  Global Optimization (Phase 1)
+  Global Optimization (Phase 2)
+  Global Optimization (Phase 3)
+  Global Optimization (Phase 4)
+  Global Optimization (Phase 5)
+  Global Optimization (Phase 6)
+  Global Optimization (Phase 7)
+  Global Optimization (Phase 8)
+  Global Optimization (Phase 9)
+  Global Optimization (Phase 10)
+  Global Optimization (Phase 11)
+  Global Optimization (Phase 12)
+  Global Optimization (Phase 13)
+  Global Optimization (Phase 14)
+  Global Optimization (Phase 15)
+  Global Optimization (Phase 16)
+  Global Optimization (Phase 17)
+  Global Optimization (Phase 18)
+  Global Optimization (Phase 19)
+  Global Optimization (Phase 20)
+  Global Optimization (Phase 21)
+  Global Optimization (Phase 22)
+  Global Optimization (Phase 23)
+  Global Optimization (Phase 24)
+  Global Optimization (Phase 25)
+  Global Optimization (Phase 26)
+  Global Optimization (Phase 27)
+  Global Optimization (Phase 28)
+  Global Optimization (Phase 29)
+  Global Optimization (Phase 30)
+  Global Optimization (Phase 31)
+
+  Beginning Isolate Ports
+  -----------------------
+
+  Beginning Delay Optimization
+  ----------------------------
+    0:00:20   26451.0      0.54     479.4      13.5                           666769.8125
+    0:00:24   26082.1      0.16     260.6       3.9                           644128.5000
+    0:00:24   26082.1      0.16     260.6       3.9                           644128.5000
+    0:00:25   26085.3      0.16     260.6       3.9                           644160.0625
+    0:00:25   26081.0      0.16     260.5       3.9                           644062.9375
+    0:00:25   26081.0      0.16     260.5       3.9                           644062.9375
+
+  Beginning WLM Backend Optimization
+  --------------------------------------
+    0:00:26   23690.5      0.16     231.8       3.9                           519169.1875
+    0:00:26   23690.5      0.16     231.8       3.9                           519169.1875
+    0:00:27   23644.5      0.16     212.2       3.9                           516678.2500
+    0:00:27   23644.5      0.16     212.2       3.9                           516678.2500
+    0:00:27   23322.3      0.16     208.2       3.9                           494217.9062
+    0:00:27   23322.3      0.16     208.2       3.9                           494217.9062
+    0:00:28   23325.5      0.16     208.2       3.9                           494326.6562
+    0:00:28   23325.5      0.16     208.2       3.9                           494326.6562
+    0:00:28   23325.5      0.16     208.2       3.9                           494326.6562
+    0:00:28   23325.5      0.16     208.2       3.9                           494326.6562
+    0:00:28   23325.5      0.16     208.2       3.9                           494326.6562
+    0:00:28   23325.5      0.16     208.2       3.9                           494326.6562
+    0:00:28   23332.2      0.15     204.0       3.9                           494585.9375
+    0:00:28   23332.2      0.15     204.0       3.9                           494585.9375
+    0:00:28   23355.6      0.15     204.0       3.9                           495207.2188
+    0:00:28   23355.6      0.15     204.0       3.9                           495207.2188
+    0:00:30   23408.5      0.10     128.5       5.7                           497029.3750
+    0:00:30   23408.5      0.10     128.5       5.7                           497029.3750
+    0:00:32   23539.4      0.09      68.8       5.7                           501635.4062
+    0:00:32   23539.4      0.09      68.8       5.7                           501635.4062
+    0:00:34   23615.2      0.05      37.5       5.7                           505832.3750
+    0:00:34   23615.2      0.05      37.5       5.7                           505832.3750
+    0:00:36   23705.1      0.05      32.3       5.7                           508563.4062
+
+
+  Beginning Design Rule Fixing  (max_capacitance)
+  ----------------------------
+
+                                  TOTAL                                                
+   ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
+  --------- --------- --------- --------- --------- ------------------------- ---------
+    0:00:36   23705.1      0.05      32.3       5.7                           508563.4062
+  Global Optimization (Phase 32)
+  Global Optimization (Phase 33)
+  Global Optimization (Phase 34)
+    0:00:37   23732.3      0.03       9.0       0.0 mac/add1_reg[21]/D        509605.3750
+    0:00:37   23729.9      0.02       4.2       0.0                           509578.6875
+    0:00:37   23745.6      0.02       8.1       0.0                           510149.9688
+
+
+  Beginning Leakage Power Optimization  (max_leakage_power 0)
+  ------------------------------------
+
+                                  TOTAL                                                
+   ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
+  --------- --------- --------- --------- --------- ------------------------- ---------
+    0:00:37   23745.6      0.02       8.1       0.0                           510149.9688
+    0:00:38   24203.1      0.00       0.0       0.0                           532504.8125
+    0:00:38   24203.1      0.00       0.0       0.0                           532504.8125
+    0:00:38   24203.1      0.00       0.0       0.0                           532504.8125
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+
+                                  TOTAL                                                
+   ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
+  --------- --------- --------- --------- --------- ------------------------- ---------
+    0:00:38   23897.4      0.00       0.0       0.0                           513788.6562
+    0:00:39   23266.5      0.01       0.2       0.0                           483138.3125
+    0:00:40   23270.7      0.00       0.0       0.0                           483491.2188
+    0:00:40   23250.5      0.00       0.0       0.0                           482986.4375
+    0:00:40   23250.5      0.00       0.0       0.0                           482986.4375
+    0:00:40   23250.5      0.00       0.0       0.0                           482895.0312
+    0:00:41   23134.3      0.00       0.0       0.0                           478993.7188
+    0:00:41   23141.2      0.00       0.0       0.0                           479433.4688
+    0:00:41   23141.2      0.00       0.0       0.0                           479433.4688
+    0:00:41   23141.2      0.00       0.0       0.0                           479433.4688
+    0:00:41   23141.2      0.00       0.0       0.0                           479433.4688
+    0:00:41   23141.2      0.00       0.0       0.0                           479433.4688
+    0:00:41   23052.6      0.00       0.0       0.0                           473742.1875
+CPU Load: 7%, Ram Free: 4 GB, Swap Free: 14 GB, Work Disk Free: 980 GB, Tmp Disk Free: 283 GB
+Loading db file '/home/home4/pmilder/ese507/synthesis/lib/NangateOpenCellLibrary_typical.db'
+
+
+Note: Symbol # after min delay cost means estimated hold TNS across all active scenarios 
+
+
+  Optimization Complete
+  ---------------------
+Warning: Design 'MMM' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+     Net 'clk': 2762 load(s), 1 driver(s)
+Information: State dependent leakage is now switched from off to on.
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+CPU Load: 7%, Ram Free: 4 GB, Swap Free: 14 GB, Work Disk Free: 980 GB, Tmp Disk Free: 283 GB
+Information: Total number of MV cells in the design.
+----------------------------------------------------------------------------------------------------
+ MV Cells                                           Total Number                                   
+----------------------------------------------------------------------------------------------------
+ Level Shifter:                                     0                                             
+ Enable Level Shifter:                              0                                             
+ Isolation Cell:                                    0                                             
+ Retention Cell:                                    0                                             
+ Retention Clamp Cell:                              0                                             
+ Switch Cell:                                       0                                             
+ Always-On Cell:                                    0                                             
+ Repeater Cell:                                     0                                             
+
+----------------------------------------------------------------------------------------------------
+Unmapped MV Cells 
+----------------------------------------------------------------------------------------------------
+0 Isolation Cells are unmapped 
+0 Retention Clamp Cells are unmapped 
+----------------------------------------------------------------------------------------------------
+1
+report_area
+ 
+****************************************
+Report : area
+Design : MMM
+Version: U-2022.12-SP7-2
+Date   : Mon Nov 25 09:41:16 2024
+****************************************
+
+Information: Updating design information... (UID-85)
+Warning: Design 'MMM' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+Library(s) Used:
+
+    NangateOpenCellLibrary (File: /home/home4/pmilder/ese507/synthesis/lib/NangateOpenCellLibrary_typical.db)
+
+Number of ports:                           88
+Number of nets:                         13148
+Number of cells:                        12928
+Number of combinational cells:          10162
+Number of sequential cells:              2762
+Number of macros/black boxes:               0
+Number of buf/inv:                       3069
+Number of references:                      50
+
+Combinational area:              10556.476169
+Buf/Inv area:                     1725.542009
+Noncombinational area:           12496.147547
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:                 23052.623716
+Total area:                 undefined
+1
+report_power
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : MMM
+Version: U-2022.12-SP7-2
+Date   : Mon Nov 25 09:41:16 2024
+****************************************
+
+
+Library(s) Used:
+
+    NangateOpenCellLibrary (File: /home/home4/pmilder/ese507/synthesis/lib/NangateOpenCellLibrary_typical.db)
+
+
+Operating Conditions: typical   Library: NangateOpenCellLibrary
+Wire Load Model Mode: top
+
+Design        Wire Load Model            Library
+------------------------------------------------
+MMM                    5K_hvratio_1_1    NangateOpenCellLibrary
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000ff
+    Time Units = 1ns
+    Dynamic Power Units = 1uW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+Attributes
+----------
+i - Including register clock pin internal power
+
+
+  Cell Internal Power  =  15.3469 mW   (98%)
+  Net Switching Power  = 243.4375 uW    (2%)
+                         ---------
+Total Dynamic Power    =  15.5903 mW  (100%)
+
+Cell Leakage Power     = 415.2132 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network  1.5126e+04            0.0000            0.0000        1.5126e+04  (  94.50%)  i
+register          34.7451           22.8662        2.1223e+05          269.8552  (   1.69%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational    186.6724          220.5713        2.0298e+05          610.2246  (   3.81%)
+--------------------------------------------------------------------------------------------------
+Total          1.5347e+04 uW       243.4375 uW     4.1521e+05 nW     1.6006e+04 uW
+1
+report_timing
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : MMM
+Version: U-2022.12-SP7-2
+Date   : Mon Nov 25 09:41:16 2024
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: typical   Library: NangateOpenCellLibrary
+Wire Load Model Mode: top
+
+  Startpoint: fifo/capacity_reg[0]
+              (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: fifo/myMemInst/data_out_reg[18]
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  MMM                5K_hvratio_1_1        NangateOpenCellLibrary
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  fifo/capacity_reg[0]/CK (DFF_X1)                        0.00 #     0.00 r
+  fifo/capacity_reg[0]/QN (DFF_X1)                        0.07       0.07 r
+  U5316/ZN (NAND2_X1)                                     0.04       0.11 f
+  U5317/ZN (OAI21_X1)                                     0.05       0.16 r
+  U7016/ZN (NAND2_X1)                                     0.03       0.19 f
+  U4188/ZN (INV_X1)                                       0.04       0.23 r
+  U7017/ZN (NAND2_X1)                                     0.04       0.27 f
+  U4656/ZN (INV_X1)                                       0.03       0.31 r
+  U7019/ZN (NAND2_X1)                                     0.03       0.34 f
+  U4273/ZN (XNOR2_X1)                                     0.06       0.41 f
+  U7020/ZN (NOR2_X1)                                      0.06       0.46 r
+  U7021/ZN (NAND3_X1)                                     0.04       0.51 f
+  U7022/ZN (OAI211_X1)                                    0.04       0.55 r
+  U7023/Z (BUF_X2)                                        0.05       0.61 r
+  U4295/ZN (INV_X1)                                       0.04       0.65 f
+  U4070/ZN (NOR2_X1)                                      0.16       0.80 r
+  U4052/Z (BUF_X2)                                        0.11       0.91 r
+  U7094/ZN (AOI22_X1)                                     0.06       0.97 f
+  U7096/ZN (NAND3_X1)                                     0.04       1.01 r
+  U7097/ZN (AOI21_X1)                                     0.03       1.04 f
+  U7098/ZN (NOR2_X1)                                      0.04       1.07 r
+  U7102/ZN (OR3_X1)                                       0.03       1.11 r
+  fifo/myMemInst/data_out_reg[18]/D (DFF_X1)              0.01       1.12 r
+  data arrival time                                                  1.12
+
+  clock clk (rise edge)                                   1.15       1.15
+  clock network delay (ideal)                             0.00       1.15
+  fifo/myMemInst/data_out_reg[18]/CK (DFF_X1)             0.00       1.15 r
+  library setup time                                     -0.03       1.12
+  data required time                                                 1.12
+  --------------------------------------------------------------------------
+  data required time                                                 1.12
+  data arrival time                                                 -1.12
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+report_timing -loops
+ 
+****************************************
+Report : timing
+        -loops
+        -max_paths 1
+Design : MMM
+Version: U-2022.12-SP7-2
+Date   : Mon Nov 25 09:41:16 2024
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: typical   Library: NangateOpenCellLibrary
+Wire Load Model Mode: top
+No loops.
+
+1
+date
+Mon Nov 25 09:41:16 2024
+# write -f verilog $TOP_MOD_NAME -output gates.v -hierarchy
+quit
+
+Memory usage for this session 216 Mbytes.
+Memory usage for this session including child processes 216 Mbytes.
+CPU usage for this session 42 seconds ( 0.01 hours ).
+Elapsed time for this session 44 seconds ( 0.01 hours ).
+
+Thank you...

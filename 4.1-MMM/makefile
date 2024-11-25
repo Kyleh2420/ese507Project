@@ -4,21 +4,21 @@
 MODULE ?= tbench
 
 #Defaults for simParams and genParams
-INW ?= 3
-OUTW ?= 8
-M ?= 3
-N ?= 3
-MAXK ?= 3
-TVALID_PROB ?= 1
-TREADY_PROB ?= .1
+INW ?= 24
+OUTW ?= 64
+M ?= 17
+N ?= 15
+MAXK ?= 20
+TVALID_PROB ?= .01
+TREADY_PROB ?= .01
 GUI ?= 0
 
 # Default target when running 'make'
 .PHONY: all
-all: genParams compile simParams
+all: compile
 
 # Compile target - compiles all .sv files using vlog
-.PHONY: compile
+.PHONY: genParams compile
 compile:
 	vlog -64 +acc *.sv
 
@@ -40,7 +40,7 @@ synthSetup:
 #Runs the synthesis and sends the output to output.txt
 .PHONY: synth
 synth:
-	dc_shell -f runsynth.tcl | tee synth_input_mems.txt
+	dc_shell -f runsynth.tcl | tee synth_MMM.txt
 
 #Terminal target - runs vsim with an input variable passed as an argument
 .PHONY: simulate

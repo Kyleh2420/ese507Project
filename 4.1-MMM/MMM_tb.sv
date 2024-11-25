@@ -121,7 +121,7 @@ endclass
 
 module MMM_tb();
 
-    parameter TESTS = 10000;    // the number of MVMs to test
+    parameter TESTS = 100000;    // the number of MVMs to test
     parameter INW   = `INWVAL;  // INW is the size of each matrix entry
     parameter OUTW  = `OUTWVAL; // OUTW is the size of each output
 

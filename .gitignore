@@ -37,4 +37,7 @@ index <= 0/1-MAC/*.swp
 /4.1-MMM/transcript
 /4.1-MMM/vsim.wlf
 /4.1-MMM/work/
+/4.1-MMM/work_synth/
 /4.1-MMM/.*
+/4.1-MMM/default.svf
+/4.1-MMM/alib-52/

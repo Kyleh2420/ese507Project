@@ -1,0 +1,4 @@
+Everything works fine. 
+Maximum speed: 1.15ns
+Small update has been made to mac_pipe from previous submission, changing what happens when a clear_acc signal is sent through.
+Massive overhaul on the input_mems.sv file from previous submission. I can't tell you specifically what changed, just that I rewrote the whole thing from scratch using the same logic and it worked this time.
