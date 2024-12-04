@@ -41,3 +41,14 @@ index <= 0/1-MAC/*.swp
 /4.1-MMM/.*
 /4.1-MMM/default.svf
 /4.1-MMM/alib-52/
+/5-Optimizing/cds.lib
+/5-Optimizing/lib.defs
+/5-Optimizing/memory.sv
+/5-Optimizing/params.sv
+/5-Optimizing/transcript
+/5-Optimizing/vsim.wlf
+/5-Optimizing/work/
+/5-Optimizing/work_synth/
+/5-Optimizing/.*
+/5-Optimizing/default.svf
+/5-Optimizing/alib-52/
