@@ -20,7 +20,7 @@ all: compile
 # Compile target - compiles all .sv files using vlog
 .PHONY: genParams compile
 compile:
-	vlog -64 +acc *.sv
+	vlog -64 +acc *.sv /home/home4/pmilder/ese507/synthesis/sim_ver/DW02_mult*.v
 
 # GUI target - runs vsim with an input variable passed as an argument
 .PHONY: gui

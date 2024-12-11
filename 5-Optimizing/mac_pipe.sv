@@ -11,15 +11,21 @@ module mac_pipe #(
 	
 	logic signed [2*INW-1:0] product;		
 	logic signed [OUTW-1:0] sum;
-    logic signed [2*INW-1:0] add1;
+    logic signed [2*INW-1:0] add1;	
 
-	//Multiply two values
-	always_comb begin
-		product = in0*in1;
-	end
+	// //Multiply two values
+	// always_comb begin
+	// 	product = in0*in1;
+	// end
+
+	DW02_mult_2_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
+
+	// DW02_mult_3_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
+
+	// DW02_mult_6_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
 
     always_ff @ (posedge clk) begin
-        //If valid_input = 1, then we can accept the multiplication. Otherwise, output 0.
+        //If valid_input_delay1 = 1, then we can accept the multiplication. Otherwise, output 0.
         if (valid_input == 1) begin
             add1 <= product;
         end

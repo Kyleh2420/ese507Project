@@ -4,7 +4,8 @@ module MMM #(
         parameter M = 7,
         parameter N = 9,
         parameter MAXK = 8,
-        localparam K_BITS = $clog2(MAXK+1)
+        localparam K_BITS = $clog2(MAXK+1),
+        localparam mulStage = 3
     )(
         input clk,
         input reset,
@@ -44,6 +45,18 @@ module MMM #(
     logic [M-1:0] outputRow;
     logic [N-1:0] outputCol;
 
+
+    //Used to delay the clear accumulate signal by one additional clock
+    logic clearAccTrigger, fifoWriteTrigger, validInputTrigger; 
+    logic clearAccDelay1,  fifoWriteEnableDelay1;
+
+    //Used to pipeline the mac unit
+    logic [2:0] writeCount; //The number of write signals that have been issued
+    logic [5:0] fifoWrEnDelay;
+    logic [5:0] clearAccDelay;
+    logic [3:0] validDelay;
+
+
     input_mems_buffer #(INW, M, N, MAXK) inputMem(
     // input_mems #(INW, M, N, MAXK) inputMem(
         .clk(clk),
@@ -82,15 +95,49 @@ module MMM #(
         .AXIS_TREADY(OUTPUT_TREADY)
     );
 
-    //Used to delay the clear accumulate signal by one additional clock
-    logic clearAccDelay1, clearAccDelay2, fifoWriteEnableDelay1, fifoWriteEnableDelay2, validDelay1;
+
+    //Used to create the shift register
+    always_comb begin
+        clearAcc <= clearAccDelay[0];
+        fifoWriteEnable <= fifoWrEnDelay[0];
+        validInput <= validDelay[0];
+
+        //count the number of 1s in the fifoWriteEnable
+        writeCount = 0;
+        for (int i = 0; i < 5; i++) begin
+            writeCount += fifoWrEnDelay[i];
+        end
+
+    end
+    
     always_ff @(posedge clk) begin : delayAccumulateClear
 
-        clearAcc <= clearAccDelay1;
-        clearAccDelay1 <= clearAccDelay2;
-        fifoWriteEnable <= fifoWriteEnableDelay1;
-        fifoWriteEnableDelay1 <= fifoWriteEnableDelay2;
-        // validInput <= validDelay1;
+        // //The original code
+        // clearAcc <= clearAccDelay1;
+        // clearAccDelay1 <= clearAccTrigger;
+        // fifoWriteEnable <= fifoWriteEnableDelay1;
+        // fifoWriteEnableDelay1 <= fifoWriteTrigger;
+
+        if(reset == 1) begin
+            for (int i = 5; i >0; i = i-1) begin
+                clearAccDelay[i] <= 0;
+                fifoWrEnDelay[i] <= 0;
+            end 
+        end
+
+        for (int i = 2; i >0; i = i-1) begin
+            clearAccDelay[i-1] <= clearAccDelay[i];
+            fifoWrEnDelay[i-1] <= fifoWrEnDelay[i];
+        end
+
+        for (int j = 1; j >0; j = j-1) begin
+            validDelay[j-1] <= validDelay[j];
+        end
+
+        clearAccDelay[2] <= clearAccTrigger;
+        fifoWrEnDelay[2] <= fifoWriteTrigger;
+        validDelay[0] <= validInputTrigger;
+
     end
 
     //Datapath stuff
@@ -117,8 +164,15 @@ module MMM #(
         endcase
     end
 
+    //Used to check if we can write to the fifo
+    // logic writePipeline;
+
     //NextState Logic
     always_comb begin : nextStateLogic
+
+        //Used in the compute state to see if there is any space at all;
+        // writePipeline = fifoWriteEnable;
+
         if (reset == 1) begin
             nextState <= waitForLoad;
         end else begin
@@ -133,7 +187,7 @@ module MMM #(
             compute: begin
                 //As long as we can write to the outputFIFO, continue computing. Unless it is full, then move to state stall
                 //We also count as full if the capacity is 1 and we're about to write to the fifo (Check fifoWriteDelay and fifoWriteDelay1)
-                if (fifoCapacity == 0 || ((fifoWriteEnable == 1 || fifoWriteEnableDelay1 == 1) && fifoCapacity == 1)) begin
+                if (fifoCapacity == 0 || (writeCount == fifoCapacity)) begin
                     //There is no space in the fifo -- stall
                     nextState <= stall;
                 end else begin
@@ -145,7 +199,7 @@ module MMM #(
                 end
             end
             stall: begin
-                if (fifoCapacity == 0 || ((fifoWriteEnable == 1 || fifoWriteEnableDelay1 == 1) && fifoCapacity == 1)) begin
+                if (fifoCapacity == 0 || (writeCount == fifoCapacity)) begin
                     //Fifo is full -- continue stalling
                     nextState <= stall;
                 end else begin
@@ -170,9 +224,9 @@ module MMM #(
         index <= index;
         outputRow <= outputRow;
         outputCol <= outputCol;
-        fifoWriteEnableDelay2 <= 0;
-        clearAccDelay2 <= 0;
-        validInput <= 0;
+        fifoWriteTrigger <= 0;
+        clearAccTrigger <= 0;
+        validInputTrigger <= 0;
 
         case (currentState)
             waitForLoad: begin
@@ -180,7 +234,7 @@ module MMM #(
                 outputCol <= 0;
                 outputRow <= 0;
                 computeFinished <= 0;
-                clearAccDelay2 <= 1;
+                clearAccTrigger <= 1;
             end
             compute: begin
                 if (index == K-1) begin
@@ -195,15 +249,15 @@ module MMM #(
                             //If the next state is waitForLoad, then this has been acknowleged. Drop computeFinished back to 0
                             if (nextState == waitForLoad) begin
                                 computeFinished <= 0;
-                                fifoWriteEnableDelay2 <= 0;
-                                clearAccDelay2 <= 1;
-                                validInput <= 0;
+                                fifoWriteTrigger <= 0;
+                                clearAccTrigger <= 1;
+                                validInputTrigger <= 0;
                             end else if (nextState != stall) begin
                                 //In addition, check to make sure we're not going to stall out 
                                 computeFinished <= 1;
-                                fifoWriteEnableDelay2 <= 1;
-                                clearAccDelay2 <= 1;
-                                validInput <= 1;
+                                fifoWriteTrigger <= 1;
+                                clearAccTrigger <= 1;
+                                validInputTrigger <= 1;
                             end
                         end else begin
                             //In this block, we're not done computing the matrix. Increment to the next row
@@ -213,9 +267,9 @@ module MMM #(
                                 index <= 0;
                                 outputRow <= outputRow + 1;
                                 outputCol <= 0;
-                                fifoWriteEnableDelay2 <= 1;
-                                clearAccDelay2 <= 1;
-                                validInput <= 1;
+                                fifoWriteTrigger <= 1;
+                                clearAccTrigger <= 1;
+                                validInputTrigger <= 1;
                             end
                         end
                     end else begin
@@ -226,23 +280,23 @@ module MMM #(
                             index <= 0;
                             outputRow <= outputRow;
                             outputCol <= outputCol + 1;
-                            fifoWriteEnableDelay2 <= 1;
-                            clearAccDelay2 <= 1;
-                            validInput <= 1;
+                            fifoWriteTrigger <= 1;
+                            clearAccTrigger <= 1;
+                            validInputTrigger <= 1;
                         end
                     end
                 end else begin
                     //Dot product is not done computing. Increment K and continue going.
                     index <= index + 1;
-                    fifoWriteEnableDelay2 <= 0;
-                    clearAccDelay2 <= 0;
-                    validInput <= 1;
+                    fifoWriteTrigger <= 0;
+                    clearAccTrigger <= 0;
+                    validInputTrigger <= 1;
                 end
             end
             stall: begin
-                fifoWriteEnableDelay2 <= 0;
-                clearAccDelay2 <= 0;
-                validInput <= 0;
+                fifoWriteTrigger <= 0;
+                clearAccTrigger <= 0;
+                validInputTrigger <= 0;
             end
         endcase
     end
