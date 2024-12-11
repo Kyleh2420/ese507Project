@@ -575,7 +575,7 @@ module input_mems #(
 
 
     //State logic -- uses enumerations
-    enum {takeInFirst, storeA, storeB, memRead} currentState;
+    enum {takeInFirst, storeA, storeB, memRead} currentState, nextState;
 
     //"Local Variables"
     //Storage of local variables (registers) that will need to be incremented and changed according to the state
@@ -605,6 +605,65 @@ module input_mems #(
         .wr_en(bWriteEnable)
     );
 
+    
+    //nextState logic
+    always_comb begin
+        unique case (currentState)
+            takeInFirst: begin
+                //The following should only happen when AXIS_TVALID = 1
+                //If newA = 0, we're reading in B. Jump to state readB. 
+                //If newA = 1, we're reading in A. Jump to state readA. 
+                //Increment the corresponding [A/B]CurrentAddress accordingly (These were already set to 0 by a previous state)
+                if (AXIS_TVALID == 1) begin
+                    if (newA == 0) begin
+                        nextState = storeB;
+                    end else begin
+                        nextState = storeA;
+                    end
+                end else begin
+                    nextState = takeInFirst;
+                end
+            end
+            storeA: begin
+                //If the data is valid, then increment the addressing. 
+                //Check if that incremented address will be the maximum address - 1. If it is
+                    //If it is, next state is storeB.
+                    //Otherwise, next state is storeA.
+                if (AXIS_TVALID == 1) begin
+                        if (aCurrentAddress == ((M * localK)-1)) begin
+                            nextState <= storeB;
+                        end else begin
+                            nextState <= storeA;
+                        end
+                    end else begin
+                        nextState <= storeA;
+                    end
+            end
+            storeB: begin
+                //If the data is valid, then increment the addressing. 
+                //Check if that incremented address will be the maximum address - 1. If it is
+                    //If it is, next state is memRead.
+                    //Otherwise, next state is storeB.
+                if (AXIS_TVALID == 1) begin
+                    if (bCurrentAddress == ((N * localK)-1)) begin
+                        nextState <= memRead;
+                    end else begin
+                        nextState <= storeB;
+                    end
+                end else begin
+                    nextState <= storeB;
+                end
+            end
+            memRead: begin
+                //If the compute is finished, go back to reading in the numbers
+                if (compute_finished == 0) begin
+                    nextState <= memRead;
+                end else begin
+                    nextState <= takeInFirst;
+                end
+            end
+        endcase
+    end
 
     //Datapath begin
     always_comb begin
@@ -697,6 +756,7 @@ module input_mems #(
 
     //Controlpath begin
     always_ff @(posedge clk) begin
+        currentState <= nextState;
         
         //Synchronous Reset line
         if (reset == 1) begin
@@ -713,16 +773,11 @@ module input_mems #(
                     //Increment the corresponding [A/B]CurrentAddress accordingly (These were already set to 0 by a previous state)
                     if (AXIS_TVALID == 1) begin
                         if (newA == 0) begin
-                            currentState <= storeB;
                             bCurrentAddress <= bCurrentAddress + 1;
                         end else begin
-                            currentState <= storeA;
                             aCurrentAddress <= aCurrentAddress + 1;
                         end
-
                         localK <= TUSER_K;       //Take in the value of K and store it in a local register
-                    end else begin
-                        currentState <= takeInFirst;
                     end
                 end
 
@@ -733,14 +788,10 @@ module input_mems #(
                         //Otherwise, next state is storeA.
                     if (AXIS_TVALID == 1) begin
                         if (aCurrentAddress == ((M * localK)-1)) begin
-                            currentState <= storeB;
                             bCurrentAddress <= 0;    //This shoud have been set previously, but for my sanity, let's set this to 0
                         end else begin
                             aCurrentAddress <= aCurrentAddress + 1;
-                            currentState <= storeA;
                         end
-                    end else begin
-                        currentState <= storeA;
                     end
                 end
 
@@ -752,13 +803,10 @@ module input_mems #(
                         //Otherwise, next state is storeB.
                     if (AXIS_TVALID == 1) begin
                         if (bCurrentAddress == ((N * localK)-1)) begin
-                            currentState <= memRead;
                         end else begin
                             bCurrentAddress <= bCurrentAddress + 1;
-                            currentState <= storeB;
                         end
                     end else begin
-                        currentState <= storeB;
                     end
 
                 end
