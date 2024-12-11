@@ -44,7 +44,7 @@ module MMM #(
     logic [M-1:0] outputRow;
     logic [N-1:0] outputCol;
 
-    input_mems_double #(INW, M, N, MAXK) inputMem(
+    input_mems #(INW, M, N, MAXK) inputMem(
     // input_mems #(INW, M, N, MAXK) inputMem(
         .clk(clk),
         .reset(reset),

@@ -337,7 +337,9 @@ module input_mems_computation #(
     always_comb begin
         //K only needs to be correct when we enter memRead.
         K = localK;
-        
+        A_addr_in = aCurrentAddress;
+        B_addr_in = bCurrentAddress;
+
         case (currentState)
             storeA: begin
                 matrices_loaded = 0;
