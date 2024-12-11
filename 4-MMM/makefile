@@ -4,13 +4,13 @@
 MODULE ?= tbench
 
 #Defaults for simParams and genParams
-INW ?= 3
-OUTW ?= 8
-M ?= 3
-N ?= 3
-MAXK ?= 3
-TVALID_PROB ?= .5
-TREADY_PROB ?= .5
+INW ?= 18
+OUTW ?= 48
+M ?= 6
+N ?= 11
+MAXK ?= 8
+TVALID_PROB ?= 1
+TREADY_PROB ?= 1
 GUI ?= 0
 
 # Default target when running 'make'

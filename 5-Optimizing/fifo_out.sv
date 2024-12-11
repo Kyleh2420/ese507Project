@@ -90,6 +90,7 @@ module fifo_out #(
 		else begin
 			//Redundant but takes care of the situations when wr_en and rd_en are equal for the other if statements
 			if ((AXIS_TREADY == wr_en) && AXIS_TVALID) begin
+			// if ((AXIS_TREADY == wr_en)) begin
 				capacity <= capacity;	
 			end
 			//Decrement capacity if we're writing
@@ -98,6 +99,7 @@ module fifo_out #(
 			end
 			//Increment capacity if reading
 			else if ((AXIS_TREADY == 1) && AXIS_TVALID) begin
+			// else if ((AXIS_TREADY == 1)) begin
 				capacity <= capacity + 1;
 			end
 		end

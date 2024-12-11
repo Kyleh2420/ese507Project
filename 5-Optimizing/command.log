@@ -1,6 +1,6 @@
 #@ # 
 #@ # Running dc_shell Version U-2022.12-SP7-2 for linux64 -- Jan 30, 2024
-#@ # Date:   Wed Dec 11 02:43:39 2024
+#@ # Date:   Wed Dec 11 03:50:41 2024
 #@ # Run by: khan@lab22.ece.stonybrook.edu
 #@ 
 
@@ -8676,17 +8676,29 @@ source /usr/local/synopsys/syn/U-2022.12-SP7-2/admin/setup/.synopsys_dc.setup
 #@ 
 #@ # -- End source /usr/local/synopsys/syn/U-2022.12-SP7-2/admin/setup/.synopsys_dc.setup
 
-source -echo -verbose /home/home5/khan/ese507/ese507Project/1-MAC/runsynth.tcl
-#@ # -- Starting source /home/home5/khan/ese507/ese507Project/1-MAC/runsynth.tcl
+source -echo -verbose /home/home5/khan/ese507/ese507Project/5-Optimizing/runsynth.tcl
+#@ # -- Starting source /home/home5/khan/ese507/ese507Project/5-Optimizing/runsynth.tcl
 
 #@ ##############################################
 #@ # Setup: fill out the following parameters: name of clock signal, clock period (ns),
 #@ # reset signal name (if used), name of top-level module, name of source file
 #@ set CLK_NAME "clk";
-#@ set CLK_PERIOD 2;
+#@ set CLK_PERIOD 1;
 #@ set RST_NAME "reset";
-#@ set TOP_MOD_NAME "mac";
-#@ set SRC_FILE "mac.sv";
+#@ set TOP_MOD_NAME "MMM";
+#@ set SRC_FILE [list "MMM.sv" "input_mems.sv" "mac_pipe.sv" "fifo_out.sv"];
+#@ 
+#@ # set CLK_NAME "clk";
+#@ # set CLK_PERIOD 2;
+#@ # set RST_NAME "reset";
+#@ # set TOP_MOD_NAME "mac_pipe";
+#@ # set SRC_FILE "mac_pipe.sv";
+#@ 
+#@ # set CLK_NAME "clk";
+#@ # set CLK_PERIOD 1;
+#@ # set RST_NAME "reset";
+#@ # set TOP_MOD_NAME "input_mems";
+#@ # set SRC_FILE "input_mems.sv";
 #@ # If you have multiple source files, change the line above to list them all like this:
 #@ # set SRC_FILE [list "file1.sv" "file2.sv"];
 #@ ###############################################

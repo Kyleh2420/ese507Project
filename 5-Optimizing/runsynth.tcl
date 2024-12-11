@@ -2,10 +2,22 @@
 # Setup: fill out the following parameters: name of clock signal, clock period (ns),
 # reset signal name (if used), name of top-level module, name of source file
 set CLK_NAME "clk";
-set CLK_PERIOD 1.15;
+set CLK_PERIOD 1;
 set RST_NAME "reset";
 set TOP_MOD_NAME "MMM";
 set SRC_FILE [list "MMM.sv" "input_mems.sv" "mac_pipe.sv" "fifo_out.sv"];
+
+# set CLK_NAME "clk";
+# set CLK_PERIOD 2;
+# set RST_NAME "reset";
+# set TOP_MOD_NAME "mac_pipe";
+# set SRC_FILE "mac_pipe.sv";
+
+# set CLK_NAME "clk";
+# set CLK_PERIOD 1;
+# set RST_NAME "reset";
+# set TOP_MOD_NAME "input_mems";
+# set SRC_FILE "input_mems.sv";
 # If you have multiple source files, change the line above to list them all like this:
 # set SRC_FILE [list "file1.sv" "file2.sv"];
 ###############################################

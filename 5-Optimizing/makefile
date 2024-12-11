@@ -9,8 +9,8 @@ OUTW ?= 64
 M ?= 17
 N ?= 15
 MAXK ?= 20
-TVALID_PROB ?= .01
-TREADY_PROB ?= .01
+TVALID_PROB ?= .5
+TREADY_PROB ?= .5
 GUI ?= 0
 
 # Default target when running 'make'

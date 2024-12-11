@@ -1,22 +1,18 @@
 // ESE 507 Stony Brook University
 // Peter Milder
 // You may not redistribute this code.
-// Testbench for MMM module
+// Testbench for input_mems module
 
 // To use this testbench:
-
 // Compile it and your accompanying design with:
-//   vlog -64 +acc test_helper.c MMM.sv [add your other .sv files to simulate here]
-//   vsim -64 -c MMM_tb -sv_seed random 
+//   vlog -64 +acc input_mems_tb.sv [add your other .sv files to simulate here]
+//   vsim -64 -c input_mems_tb -sv_seed random 
 //      [options]:
 //       - If you want to run in GUI mode, remove -c
 
 // Note that this testbench relies on params.sv, which can be generated 
-// using the ./genParams4 script. See instructions in the project description.
+// using the ./genParams3 script. See instructions in the project description.
 
-
-// Import the C function (in test_helper.c) that computes the output matrix given the input matrices.
-import "DPI-C" function void calcOutput(input int matrixA[], input int matrixB[],input int M, input int N, input int K, output longint outmat[], input int OUTW);
 
 
 // A class to hold one instance of test data and its expected output. When we call 
@@ -26,7 +22,7 @@ import "DPI-C" function void calcOutput(input int matrixA[], input int matrixB[]
 // These functions will generate random input values. The difference between 
 // these is that force_new_A() will always set new_A=1 while allow_old_A() will 
 // randomly pick whether to use the old A matrix or create a new one.
-class testdata #(parameter INW=8, parameter OUTW=32, parameter M=18, parameter N=15, parameter MAXK=18);
+class testdata #(parameter INW=8, parameter M=18, parameter N=15, parameter MAXK=18);
     
     // The value of K
     rand logic [$clog2(MAXK+1)-1:0] K;
@@ -37,11 +33,11 @@ class testdata #(parameter INW=8, parameter OUTW=32, parameter M=18, parameter N
     constraint c {K dist {[2:MAXK] := 1};}
 
     // an M x MAXK matrix
-    // we will only use K columns of this
+    // We will only use K columns of this
     rand int matrixA[M*MAXK];   
     
     // a MAXK x N matrix
-    // we will only use K rows of this
+    // We will only use K rows of this
     rand int matrixB[MAXK*N];
     
     // These constraints will ensure that the matrix values follow K and that 
@@ -73,33 +69,25 @@ class testdata #(parameter INW=8, parameter OUTW=32, parameter M=18, parameter N
             }
         }
     }
+    
 
     // new_A==0 means this test will use the previous A matrix; new_A==1 means this
     // test will load a new inputA matrix.
     rand logic new_A;    
 
-    // The expected output vector of this MMM calculation
-    longint output_matrix[M*N];
-
-    // This will randomize K and the input matrices, forcing new_A to 1. It will 
-    // then calculated the expected output.
+    // This will randomize K and the input matrices, forcing new_A to 1
     function void force_new_A();
         // randomize matrixA, matrixB, K, and new_A
         assert(this.randomize());   
 
         // force new_A to 1
         this.new_A = 1;       
-
-        // calculate the expected result and store in this.output_matrix
-        calcOutput(this.matrixA, this.matrixB, M, N, this.K, this.output_matrix, OUTW);
-
     endfunction
-
 
     // This will randomly choose new_A. If it is 1, it will generate a new
     // random A matrix. If it is 0, it will copy the old matrix from olddata.
-    // Then it will generate a new matrixB and compute the expected output.
-    function void allow_old_A(testdata #(INW, OUTW, M, N, MAXK) olddata);
+    // Then it will generate a new matrixB.
+    function void allow_old_A(testdata #(INW, M, N, MAXK) olddata);
         // randomize 
         assert(this.randomize());
 
@@ -110,76 +98,66 @@ class testdata #(parameter INW=8, parameter OUTW=32, parameter M=18, parameter N
             this.K = olddata.K;
         end
 
-        // calculate the expected result and store in this.output_matrix     
-        calcOutput(this.matrixA, this.matrixB, M, N, this.K, this.output_matrix, OUTW);
-
     endfunction
 
 endclass
 
 `include "params.sv"
 
-module MMM_tb();
+module input_mems_tb();
 
-    parameter TESTS = 10000;    // the number of MVMs to test
     parameter INW   = `INWVAL;  // INW is the size of each matrix entry
-    parameter OUTW  = `OUTWVAL; // OUTW is the size of each output
+    parameter M     = `MVAL;    // M is the number of rows in the A matrix
+    parameter N     = `NVAL;    // N is the number of cols in the B matrix
+    parameter MAXK  = `MAXKVAL; // MAXK is the maximum number of cols in A/rows in B
+    parameter TESTS = 10000;    // the number of sets of inputs to simulate
 
-    // We require 2 <= INW < 32 and 4 <= OUTW <= 64.
-    // OUTW must also be large enough to prevent the accumulator from overflowing.
-    // (If the accumulator overflows, the testbench will warn you when it computes
-    // the expected result.)
-    
-    parameter M=`MVAL;        // M is the number of rows in the A matrix
-    parameter N=`NVAL;        // N is the number of cols in the B matrix
-    parameter MAXK=`MAXKVAL;  // MAXK is the maximum number of cols in A/rows in B
-    
-
-    // The probability that the testbench asserts INPUT_TVALID=1 and OUTPUT_TREADY
-    // on any given cycle.
-    // You can adjust these values to simulate different scenarios.
-    // Valid values for these parameters are 0.001 to 1. 
-    // If a value is set to 0, then it will be randomized when you start
+    // The probability that the testbench asserts AXIS_TVALID=1 
+    // on any given cycle. You can adjust this value to simulate different 
+    // scenarios. Valid values for this parameter are 0.001 to 1. 
+    // If the value is set to 0, then it will be randomized when you start
     // your simulation.
     parameter real INPUT_TVALID_PROB = `TVPR;
-    parameter real OUTPUT_TREADY_PROB = `TRPR;
 
-    localparam K_BITS = $clog2(MAXK+1); // the number of bits needed for K
-
-    //localparam LOGN      = $clog2(N);
-    //localparam LOGMN     = $clog2(M*N);
+    localparam K_BITS      = $clog2(MAXK+1); // the number of bits needed for K
+    localparam A_ADDR_BITS = $clog2(M*MAXK); // number of bits to address A
+    localparam B_ADDR_BITS = $clog2(MAXK*N); // number of bits to address B
 
     logic clk, reset;
+    initial clk=0;
+    always #5 clk = ~clk;
     
     // Signals for the DUT's AXI-Stream input interface
     logic signed [INW-1:0] INPUT_TDATA;
     logic INPUT_TVALID;
-
+    
     // AXIS_TUSER[K_BITS:1] is the value of K during the first matrix entry
-    // AXIS_TUSER[0] is the new_A signal during the first matrix entry  
+    // AXIS_TUSER[0] is the new_A signal during the first matrix entry
     logic [K_BITS:0] INPUT_TUSER; 
     logic INPUT_TREADY;   
-    
-    // Signals for the DUT's AXI-Stream output interface
-    logic signed [OUTW-1:0] OUTPUT_TDATA;
-    logic                   OUTPUT_TVALID;
-    logic                   OUTPUT_TREADY;
 
-    initial clk=0;
-    always #5 clk = ~clk;
+    // control/status signals to the rest of the system
+    logic matrices_loaded;  // tells the control module to start computing
+    logic compute_finished; // comes from outside of this module to say we're done with these matrices
+    logic [K_BITS-1:0] K;   // the value of K 
 
-    // Instantiate the DUT
-    MMM #(INW, OUTW, M, N, MAXK) dut(clk, reset, INPUT_TDATA, INPUT_TVALID, INPUT_TUSER, INPUT_TREADY, OUTPUT_TDATA, OUTPUT_TVALID, OUTPUT_TREADY);
+    // memory interfaces to read data from the memories
+    logic [A_ADDR_BITS-1:0] A_read_addr;
+    logic signed [INW-1:0]  A_data;
+    logic [B_ADDR_BITS-1:0] B_read_addr;
+    logic signed [INW-1:0]  B_data;
+
+    // instantiate the DUT
+    input_mems #(INW, M, N, MAXK) dut(clk, reset, INPUT_TDATA, INPUT_TVALID, INPUT_TUSER, INPUT_TREADY, matrices_loaded, compute_finished, K, A_read_addr, A_data, B_read_addr, B_data);
 
     // This is an array of "testdata" objects. (See definition of the testdata class above.)
-    // It will will hold all of our test data. Each "testdata" object holds data for one MMM operation test case.
-    // It holds a set of inputs (matrixA, matrixB, K, new_A) and the corresponding expected output. 
-    testdata #(INW, OUTW, M, N, MAXK) td[TESTS];
+    // It will will hold all of our test data. Each "testdata" object holds data for one MMM input.
+    testdata #(INW, M, N, MAXK) td[TESTS];
 
-    // generate random bits to use when randomizing INPUT_TVALID and OUTPUT_TREADY
-    logic rb0, rb1;
+    // generate random bits to use when randomizing INPUT_TVALID 
+    logic rb0;
     logic [9:0] randomNum;
-    logic [9:0] tvalid_prob, tready_prob;
+    logic [9:0] tvalid_prob;
 
     initial begin
         if (INPUT_TVALID_PROB >= 0.001)
@@ -187,31 +165,21 @@ module MMM_tb();
         else
             tvalid_prob = ($urandom % 1024);
 
-        if (OUTPUT_TREADY_PROB >= 0.001)
-            tready_prob = (1024*OUTPUT_TREADY_PROB-1);
-        else
-            tready_prob = ($urandom % 1024);
-
         $display("--------------------------------------------------------");
-        $display("Starting top-level simulation: %d tests", TESTS);
-        $display("M x N: %d x %d", M, N);
-        $display("MAXK:  %d", MAXK);
-        $display("Input %d bits\nOutput: %d bits", INW, OUTW);
+        $display("Starting input_mems simulation: %d tests", TESTS);
+        $display("(M,N,MAXK): %d, %d, %d", M, N, MAXK);
+        $display("Input %d bits", INW);
 
         $display("INPUT_TVALID_PROB = %1.3f", real'(tvalid_prob+1)/1024);
-        $display("OUTPUT_TREADY_PROB = %1.3f", real'(tready_prob+1)/1024);            
         $display("--------------------------------------------------------");
     end
 
-    // Every clock cycle, randomly generate rb0 and rb1 for the INPUT_TVALID and
-    // OUTPUT_TREADY signals, respectively
+    // Every clock cycle, randomly generate rb0  for the INPUT_TVALID signal
     always begin
         @(posedge clk);
         #1;
         randomNum = $urandom;
         rb0 = (randomNum <= tvalid_prob);
-        randomNum = $urandom;
-        rb1 = (randomNum <= tready_prob);
     end
 
     // Logic to keep track of where we are in the test data.
@@ -226,13 +194,13 @@ module MMM_tb();
             if (which_element == M*td[which_test].K + N*td[which_test].K-1) begin // if we just finished loading this test...
                 which_test <= #1 which_test+1;   // increment to next test
 
-                // if we are not at the last test input:
+                // if we are not at the last test:
                 if (which_test < TESTS-1) begin
                     // if the next test has a new_A, set the counter back to 0
                     if (td[which_test+1].new_A == 1) begin
                         which_element <= #1 0;
                     end
-                    else begin // if doesn't have a new_A, set the counter to the vector location
+                    else begin // if doesn't have a new_A, set the counter to the matrixB location
                         which_element <= #1 M*td[which_test+1].K;
                     end
                 end
@@ -255,7 +223,7 @@ module MMM_tb();
 
     // Logic to set the value of INPUT_TDATA based on the random input value and the 
     // which_element and which_test variables
-    always @(INPUT_TVALID or which_element or which_test) begin
+    always @(which_element or which_test or INPUT_TVALID) begin
         INPUT_TDATA = 'x;
          if (INPUT_TVALID == 1) begin
             if (which_element < M*td[which_test].K) begin  // we are loading the matrix
@@ -269,7 +237,7 @@ module MMM_tb();
 
     // Logic to set the value of INPUT_TUSER based on the random input value and the 
     // which_element and which_test variables
-    always @(INPUT_TVALID or which_element or which_test) begin
+    always @(INPUT_TVALID or which_test or which_element) begin
         INPUT_TUSER = 'x;
          if (INPUT_TVALID == 1) begin
             if ((td[which_test].new_A == 1) && (which_element == 0))
@@ -278,6 +246,7 @@ module MMM_tb();
                 INPUT_TUSER = {td[which_test].K, 1'b0};
         end
     end    
+
 
     // generate our test input data and expected output data
     initial begin        
@@ -289,49 +258,59 @@ module MMM_tb();
             td[i].allow_old_A(td[i-1]);     
         end
     end
-
-    // Logic to set OUTPUT_TREADY based on random value rb1
-    logic [31:0] which_test_out, which_element_out; 
-    always @* begin
-        if ((which_test_out < TESTS) && (rb1==1'b1))
-            OUTPUT_TREADY = 1;
-        else
-            OUTPUT_TREADY = 0;
-    end
-
     
+    logic [31:0] which_test_out; 
     integer errors = 0;
     initial which_test_out = 0;
-    initial which_element_out = 0;
 
     integer cycle_count=0;
 
-    // Logic to check the outputs and keep track of which output test you are checking
+    // when matrices_loaded is 1, check that the K output of the DUT
+    // is correct
     always @(posedge clk) begin
-        if (OUTPUT_TVALID && OUTPUT_TREADY) begin 
-            if (OUTPUT_TDATA !== td[which_test_out].output_matrix[which_element_out]) begin
-                $display($time,,"ERROR: Test %d, y[%d] = %d; expected value = %d", which_test_out, which_element_out, OUTPUT_TDATA, td[which_test_out].output_matrix[which_element_out]);        
-                errors = errors+1;
-            end
-            if (which_element_out == N*M-1) begin
-                which_element_out = 0;
-                which_test_out = which_test_out+1;
-            end 
-            else begin
-                which_element_out = which_element_out+1;
-            end
+        if ((matrices_loaded == 1) && (K !== td[which_test_out].K)) begin
+            $display($time,, "ERROR: Test %d, K = %d; expected value = %d", which_test_out, K, td[which_test_out].K);
+            errors = errors+1;
         end
-    end
+    end 
 
-    // Logic to count cycles, used in our throughput testing
-    always @(posedge clk) begin
+    // Logic to check the outputs and keep track of which output test you are checking
+    initial begin
+        compute_finished = 0;
 
-        // reset the cycle_counter on the first element of the first input
-        if (INPUT_TVALID && INPUT_TREADY && (which_test==0) && (which_element==0))
-            cycle_count <= 0;    
-        else
-            cycle_count <= cycle_count+1;
+        while (which_test_out < TESTS) begin
+            wait (matrices_loaded == 1); #1; // wait until inputs are loaded into memory
 
+            // Read the DUT's matrixA and matrixB memories and check correctness
+            A_read_addr = 0;
+            for (int i=1; i <= M*td[which_test_out].K; i++) begin
+                @(posedge clk);
+                #1;
+                if (A_data !== td[which_test_out].matrixA[i-1]) begin
+                    $display($time,,"ERROR: Test %d, A_data[%d] = %d; expected value = %d", which_test_out, i-1, A_data, td[which_test_out].matrixA[i-1]);
+                    errors = errors+1;
+                end         
+                A_read_addr = i;       
+            end
+            B_read_addr = 0;
+            for (int i=1; i <= N*td[which_test_out].K; i++) begin
+                @(posedge clk);
+                #1;
+                if (B_data !== td[which_test_out].matrixB[i-1]) begin
+                    $display($time,,"ERROR: Test %d, B_data[%d] = %d; expected value = %d", which_test_out, i-1, B_data, td[which_test_out].matrixB[i-1]);
+                    errors = errors+1;
+                end
+                B_read_addr = i;                
+            end
+            // Toggle "compute_finished" so the DUT can start on its next task
+            #1;
+            compute_finished = 1;
+
+            @(posedge clk);
+            #1;
+            compute_finished = 0;
+            which_test_out = which_test_out+1;
+        end
     end
 
     // Logic to assert reset at the beginning, then wait until all tests are done,
@@ -341,8 +320,7 @@ module MMM_tb();
         @(posedge clk); #1; reset = 0; 
 
         wait(which_test_out == TESTS);
-        $display("Simulated %d tests, with a total of %d output values. Detected %d errors.", TESTS, TESTS*N*M, errors);
-        $display("Your system computed %d MMMs in %d cycles --> %e MMMs per cycle", TESTS, cycle_count, real'(TESTS)/(real'(cycle_count)));
+        $display("Simulated %d tests. Detected %d errors.", TESTS, errors);
         #1;
         $finish;
     end
