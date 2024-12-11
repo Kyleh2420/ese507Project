@@ -80,8 +80,20 @@ add wave -noupdate /MMM_tb/dut/inputMem/input_interface/matrixA/mem
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/matrixB/mem
 add wave -noupdate /MMM_tb/dut/inputMem/input_computation/matrixA/mem
 add wave -noupdate /MMM_tb/dut/inputMem/input_computation/matrixB/mem
+add wave -noupdate /MMM_tb/errors
+add wave -noupdate -divider MAC
+add wave -noupdate /MMM_tb/dut/mac/out
+add wave -noupdate /MMM_tb/dut/mac/clk
+add wave -noupdate /MMM_tb/dut/mac/reset
+add wave -noupdate /MMM_tb/dut/mac/clear_acc
+add wave -noupdate -radix decimal /MMM_tb/dut/mac/in0
+add wave -noupdate -radix decimal /MMM_tb/dut/mac/in1
+add wave -noupdate -radix decimal /MMM_tb/dut/mac/product
+add wave -noupdate -radix decimal /MMM_tb/dut/mac/valid_input
+add wave -noupdate -radix decimal /MMM_tb/dut/mac/sum
+add wave -noupdate -radix decimal /MMM_tb/dut/mac/add1
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {325 ns} 0}
+WaveRestoreCursors {{Cursor 1} {5771 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 408
 configure wave -valuecolwidth 100
@@ -97,4 +109,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {1050 ns}
+WaveRestoreZoom {5750 ns} {6014 ns}

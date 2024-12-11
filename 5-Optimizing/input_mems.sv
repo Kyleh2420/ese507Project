@@ -356,6 +356,9 @@ module input_mems_computation #(
     logic [A_ADDR_BITS-1:0] aCurrentAddress;    //Total Address Bits required by memory bank A
     logic [B_ADDR_BITS-1:0] bCurrentAddress;    //Total Address Bits required by memory bank B
 
+    logic [A_ADDR_BITS-1:0] aCurrentAddress_delay1;    //Total Address Bits required by memory bank A
+    logic [B_ADDR_BITS-1:0] bCurrentAddress_delay1;    //Total Address Bits required by memory bank B
+
     //Named nets between the memory modules (Just to keep things organized)
     logic[A_ADDR_BITS-1:0] aAddress;
     logic[B_ADDR_BITS-1:0] bAddress;
@@ -391,16 +394,16 @@ module input_mems_computation #(
         case (currentState)
             storeA: begin
                 matrices_loaded = 0;
-                aAddress = aCurrentAddress;
-                bAddress = bCurrentAddress;
+                aAddress = aCurrentAddress_delay1;
+                bAddress = bCurrentAddress_delay1;
 
                 aWriteEnable = 1;
                 bWriteEnable = 0;
             end
             storeB: begin
                 matrices_loaded = 0;
-                aAddress = aCurrentAddress;
-                bAddress = bCurrentAddress;
+                aAddress = aCurrentAddress_delay1;
+                bAddress = bCurrentAddress_delay1;
 
                 aWriteEnable = 0;
                 bWriteEnable = 1;
@@ -429,6 +432,9 @@ module input_mems_computation #(
     //Otherwise, sets it to 0 for the other values
     always_ff @( posedge clk ) begin
 
+        aCurrentAddress_delay1 <= aCurrentAddress;
+        bCurrentAddress_delay1 <= bCurrentAddress;
+
         //Synchronous reset line
         if (reset == 1) begin
             currentState <= waitForLoad;
@@ -448,12 +454,6 @@ module input_mems_computation #(
             memRead: begin
                 aCurrentAddress <= 0;
                 bCurrentAddress <= 0;
-                // if (nextState == storeA) begin
-                //     aCurrentAddress <= aCurrentAddress + 1;
-                // end
-                // if (nextState == storeB) begin
-                //     bCurrentAddress <= bCurrentAddress + 1;
-                // end
             end
             waitForLoad: begin
                 aCurrentAddress <= 0;
@@ -467,7 +467,7 @@ module input_mems_computation #(
         case (currentState)
             storeA: begin
                 getNewData = 0;
-                if (aCurrentAddress == ((M * K_in)-1)) begin
+                if (aCurrentAddress == ((M * K_in))) begin
                     nextState = storeB;
                 end else begin
                     nextState = storeA;
@@ -475,7 +475,7 @@ module input_mems_computation #(
             end
             storeB: begin
                 getNewData = 0;
-                if (bCurrentAddress == ((N * K_in)-1)) begin
+                if (bCurrentAddress == ((N * K_in))) begin
                     getNewData = 1; //Trigger the other input_mems module to get new data from the AXIS interface in preparation for the next read
                     nextState = memRead;
                 end else begin
@@ -527,7 +527,7 @@ module input_mems_computation #(
 
 endmodule
 
-module input_mems_double #(
+module input_mems_buffer #(
         parameter INW = 12,
         parameter M = 7,
         parameter N = 9,

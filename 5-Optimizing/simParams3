@@ -27,8 +27,8 @@ else
     ./genParams3 $1 $2 $3 $4 $5
     vlog -64 +acc *.sv
     if [[ $6 -eq 0 ]]; then
-        vsim -64 -sv_seed random -c input_mems_tb -do "run -all; quit"
+        vsim -64 -sv_seed 0 -c input_mems_tb -do "run -all; quit"
     else 
-        vsim -64 -sv_seed random input_mems_tb
+        vsim -64 -sv_seed 0 input_mems_tb
     fi
 fi

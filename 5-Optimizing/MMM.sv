@@ -44,7 +44,7 @@ module MMM #(
     logic [M-1:0] outputRow;
     logic [N-1:0] outputCol;
 
-    input_mems_double #(INW, M, N, MAXK) inputMem(
+    input_mems_buffer #(INW, M, N, MAXK) inputMem(
     // input_mems #(INW, M, N, MAXK) inputMem(
         .clk(clk),
         .reset(reset),
@@ -180,6 +180,7 @@ module MMM #(
                 outputCol <= 0;
                 outputRow <= 0;
                 computeFinished <= 0;
+                clearAccDelay2 <= 1;
             end
             compute: begin
                 if (index == K-1) begin
@@ -195,7 +196,7 @@ module MMM #(
                             if (nextState == waitForLoad) begin
                                 computeFinished <= 0;
                                 fifoWriteEnableDelay2 <= 0;
-                                clearAccDelay2 <= 0;
+                                clearAccDelay2 <= 1;
                                 validInput <= 0;
                             end else if (nextState != stall) begin
                                 //In addition, check to make sure we're not going to stall out 
