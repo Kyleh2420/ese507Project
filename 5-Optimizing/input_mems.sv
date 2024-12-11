@@ -541,222 +541,6 @@ module input_mems_computation #(
 
 endmodule
 
-module input_mems_computation2x #(
-        parameter INW = 12,
-        parameter M = 7,
-        parameter N = 9,
-        parameter MAXK = 8,
-        localparam K_BITS = $clog2(MAXK+1),
-        localparam A_ADDR_BITS = $clog2(M*MAXK),
-        localparam B_ADDR_BITS = $clog2(MAXK*N)
-    )(
-        input clk, reset,
-
-        input logic [INW-1:0] A_data_in,
-        output logic [A_ADDR_BITS-1:0] A_addr_in,
-
-        input logic [INW-1:0] B_data_in,
-        output logic [B_ADDR_BITS-1:0] B_addr_in,
-
-        input logic finishedLoading,
-
-        output logic getNewData,
-
-        input logic [K_BITS-1:0] K_in,
-        input logic newAIn,
-
-        input [A_ADDR_BITS-1:0] A_read_addr,
-        input [B_ADDR_BITS-1:0] B_read_addr,
-        output logic signed [INW-1:0] B_data,
-        output logic signed [INW-1:0] A_data,
-
-        output logic matrices_loaded,
-        input compute_finished,
-
-        output logic [K_BITS-1:0] K
-        
-    );
-
-    //State logic -- uses enumerations
-    enum {storeA, storeB, memRead, waitForLoad} currentState, nextState;
-
-
-    //"Local Variables"
-    //Storage of local variables (registers) that will need to be incremented and changed according to the state
-    logic [A_ADDR_BITS-1:0] aCurrentAddress;    //Total Address Bits required by memory bank A
-    logic [B_ADDR_BITS-1:0] bCurrentAddress;    //Total Address Bits required by memory bank B
-
-    logic [A_ADDR_BITS-1:0] aCurrentAddress_delay1;    //Total Address Bits required by memory bank A
-    logic [B_ADDR_BITS-1:0] bCurrentAddress_delay1;    //Total Address Bits required by memory bank B
-
-    //Named nets between the memory modules (Just to keep things organized)
-    logic[A_ADDR_BITS-1:0] aAddress;
-    logic[B_ADDR_BITS-1:0] bAddress;
-    logic aWriteEnable, bWriteEnable;
-
-    logic [K_BITS-1:0] localK;  
-
-    //Memory instantiation for both the A and B data banks
-    memory #(INW,M*MAXK) matrixA(
-        .data_in(A_data_in),   //Memories get a direct connection to the input data. To control read/writes, use the writeEnable signals
-        .data_out(A_data),
-        .addr(aAddress),
-        .clk(clk),
-        .wr_en(aWriteEnable)
-    );
-    memory #(INW,MAXK*N) matrixB(
-        .data_in(B_data_in),   //Memories get a direct connection to the input data. To control read/writes, use the writeEnable signals
-        .data_out(B_data),
-        .addr(bAddress),
-        .clk(clk),
-        .wr_en(bWriteEnable)
-    );
-    
-
-    //Logic for write enables and addressing multiplexing
-    //Also takes care of matrices Loaded signal
-    always_comb begin
-        //K only needs to be correct when we enter memRead.
-        K = localK;
-        A_addr_in = aCurrentAddress;
-        B_addr_in = bCurrentAddress;
-
-        case (currentState)
-            storeA: begin
-                matrices_loaded = 0;
-                aAddress = aCurrentAddress_delay1;
-                bAddress = bCurrentAddress_delay1;
-
-                aWriteEnable = 1;
-                bWriteEnable = 0;
-            end
-            storeB: begin
-                matrices_loaded = 0;
-                aAddress = aCurrentAddress_delay1;
-                bAddress = bCurrentAddress_delay1;
-
-                aWriteEnable = 0;
-                bWriteEnable = 1;
-            end
-            memRead: begin
-                matrices_loaded = 1;
-                aAddress = A_read_addr;
-                bAddress = B_read_addr;
-
-                aWriteEnable = 0;
-                bWriteEnable = 0;
-            end
-            waitForLoad: begin
-                matrices_loaded = 0;
-                aAddress = A_read_addr;
-                bAddress = B_read_addr;
-
-                aWriteEnable = 0;
-                bWriteEnable = 0;
-            end
-        endcase
-    end
-
-    //Incrementing logic/current state stuff
-    //Increments the current address of the corresponding value on clock edge.
-    //Otherwise, sets it to 0 for the other values
-    always_ff @( posedge clk ) begin
-
-        aCurrentAddress_delay1 <= aCurrentAddress;
-        bCurrentAddress_delay1 <= bCurrentAddress;
-
-        //Synchronous reset line
-        if (reset == 1) begin
-            currentState <= waitForLoad;
-            aCurrentAddress <= 0;
-            bCurrentAddress <= 0;
-        end else begin
-            currentState <= nextState;
-        end
-
-        case (currentState)
-            storeA: begin
-                aCurrentAddress <= aCurrentAddress + 1;
-            end
-            storeB: begin
-                bCurrentAddress <= bCurrentAddress + 1;
-            end
-            memRead: begin
-                aCurrentAddress <= 0;
-                bCurrentAddress <= 0;
-            end
-            waitForLoad: begin
-                aCurrentAddress <= 0;
-                bCurrentAddress <= 0;
-            end
-        endcase
-    end
-
-    //Takes care of nextState logic
-    always_comb begin
-        case (currentState)
-            storeA: begin
-                getNewData = 0;
-                if (aCurrentAddress == ((M * K_in))) begin
-                    nextState = storeB;
-                end else begin
-                    nextState = storeA;
-                end
-            end
-            storeB: begin
-                getNewData = 0;
-                if (bCurrentAddress == ((N * K_in))) begin
-                    getNewData = 1; //Trigger the other input_mems module to get new data from the AXIS interface in preparation for the next read
-                    nextState = memRead;
-                end else begin
-                    nextState = storeB;
-                end
-            end
-            memRead: begin
-                getNewData = 0;
-                if (compute_finished == 1) begin
-                    if (finishedLoading == 1) begin
-                        //As long as the previous stage is done loading, we should change state
-                        if (newAIn == 1) begin
-                            //If we should rewrite A, go here
-                            nextState = storeA;
-                            localK = K_in;  //Copy the new K into the local memory
-                        end else begin
-                            //If we should just rewrite B, go here
-                            nextState = storeB;
-                            localK = K_in;  //Copy the new K into the local memory
-                        end
-                    end else begin
-                        //If the previous stge is not done loading, just wait for it complete loading
-                        nextState = waitForLoad;
-                    end
-                end else begin
-                    nextState = memRead;
-                end
-            end
-            waitForLoad: begin
-                getNewData = 0;
-                if (finishedLoading == 1) begin
-                        //As long as the previous stage is done loading, we should change state
-                        if (newAIn == 1) begin
-                            //If we should rewrite A, go here
-                            nextState = storeA;
-                            localK = K_in;  //Copy the new K into the local memory
-                        end else begin
-                            //If we should just rewrite B, go here
-                            nextState = storeB;
-                            localK = K_in;  //Copy the new K into the local memory
-                        end
-                    end else begin
-                        //If the previous stge is not done loading, just wait for it complete loading
-                        nextState = waitForLoad;
-                    end
-            end
-        endcase
-    end
-
-endmodule
-
 module input_mems_buffer #(
         parameter INW = 12,
         parameter M = 7,
@@ -827,6 +611,213 @@ module input_mems_buffer #(
         .compute_finished(compute_finished),
         .K(K)
     );
+
+endmodule
+
+module input_mems_computation2x #(
+        parameter INW = 12,
+        parameter M = 7,
+        parameter N = 9,
+        parameter MAXK = 8,
+        localparam K_BITS = $clog2(MAXK+1),
+        localparam A_ADDR_BITS = $clog2(M*MAXK),
+        localparam B_ADDR_BITS = $clog2(MAXK*N)
+    )(
+        input clk, reset,
+
+        input logic [INW-1:0] A_data_in,
+        output logic [A_ADDR_BITS-1:0] A_addr_in,
+
+        input logic [INW-1:0] B_data_in,
+        output logic [B_ADDR_BITS-1:0] B_addr_in,
+
+        input logic finishedLoading,
+
+        output logic getNewData,
+
+        input logic [K_BITS-1:0] K_in,
+        input logic newAIn,
+
+        input [A_ADDR_BITS-1:0] A_read_addr,
+        input [B_ADDR_BITS-1:0] B_read_addr,
+        output logic signed [INW-1:0] B_data,
+        output logic signed [INW-1:0] A_data,
+
+        output logic matrices_loaded,
+        input compute_finished,
+
+        output logic [K_BITS-1:0] K
+        
+    );
+
+    //State logic -- uses enumerations
+    enum {storeMatrix, memRead, waitForLoad} currentState, nextState;
+
+
+    //"Local Variables"
+    //Storage of local variables (registers) that will need to be incremented and changed according to the state
+    logic [A_ADDR_BITS-1:0] aCurrentAddress;    //Total Address Bits required by memory bank A
+    logic [B_ADDR_BITS-1:0] bCurrentAddress;    //Total Address Bits required by memory bank B
+
+    logic [A_ADDR_BITS-1:0] aCurrentAddress_delay1;    //Total Address Bits required by memory bank A
+    logic [B_ADDR_BITS-1:0] bCurrentAddress_delay1;    //Total Address Bits required by memory bank B
+
+    //Named nets between the memory modules (Just to keep things organized)
+    logic[A_ADDR_BITS-1:0] aAddress;
+    logic[B_ADDR_BITS-1:0] bAddress;
+    logic aWriteEnable, bWriteEnable;
+
+    logic [K_BITS-1:0] localK;  
+
+    //Memory instantiation for both the A and B data banks
+    memory #(INW,M*MAXK) matrixA(
+        .data_in(A_data_in),   //Memories get a direct connection to the input data. To control read/writes, use the writeEnable signals
+        .data_out(A_data),
+        .addr(aAddress),
+        .clk(clk),
+        .wr_en(aWriteEnable)
+    );
+    memory #(INW,MAXK*N) matrixB(
+        .data_in(B_data_in),   //Memories get a direct connection to the input data. To control read/writes, use the writeEnable signals
+        .data_out(B_data),
+        .addr(bAddress),
+        .clk(clk),
+        .wr_en(bWriteEnable)
+    );
+    
+
+    //Logic for write enables and addressing multiplexing
+    //Also takes care of matrices Loaded signal
+    always_comb begin
+        //K only needs to be correct when we enter memRead.
+        K = localK;
+        A_addr_in = aCurrentAddress;
+        B_addr_in = bCurrentAddress;
+
+        case (currentState)
+            storeMatrix: begin
+                matrices_loaded = 0;
+                aAddress = aCurrentAddress_delay1;
+                bAddress = bCurrentAddress_delay1;
+
+                //Default values
+                aWriteEnable = 0;
+                bWriteEnable = 0;
+                //As long as we are still below the maximum, continue leaving wrEn = 1
+                if (aCurrentAddress <= ((M * K_in))) begin
+                    aWriteEnable = 1;
+                end
+                //As long as we are still below the maximum, continue leaving wrEn = 1
+                if (bCurrentAddress <= ((N * K_in))) begin
+                    bWriteEnable = 1;
+                end
+            end
+            memRead: begin
+                matrices_loaded = 1;
+                aAddress = A_read_addr;
+                bAddress = B_read_addr;
+
+                aWriteEnable = 0;
+                bWriteEnable = 0;
+            end
+            waitForLoad: begin
+                matrices_loaded = 0;
+                aAddress = A_read_addr;
+                bAddress = B_read_addr;
+
+                aWriteEnable = 0;
+                bWriteEnable = 0;
+            end
+        endcase
+    end
+
+    //Incrementing logic/current state stuff
+    //Increments the current address of the corresponding value on clock edge.
+    //Otherwise, sets it to 0 for the other values
+    always_ff @( posedge clk ) begin
+
+        aCurrentAddress_delay1 <= aCurrentAddress;
+        bCurrentAddress_delay1 <= bCurrentAddress;
+
+        //Synchronous reset line
+        if (reset == 1) begin
+            currentState <= waitForLoad;
+            aCurrentAddress <= 0;
+            bCurrentAddress <= 0;
+        end else begin
+            currentState <= nextState;
+        end
+
+        case (currentState)
+            storeMatrix: begin
+                //As long as we are still below the maximum, continue incrementing
+                if (aCurrentAddress <= ((M * K_in))) begin
+                    aCurrentAddress <= aCurrentAddress + 1;
+                end
+                //As long as we are still below the maximum, continue incrementing
+                if (bCurrentAddress <= ((N * K_in))) begin
+                    bCurrentAddress <= bCurrentAddress + 1;
+                end
+            end
+            memRead, waitForLoad: begin
+                aCurrentAddress <= 0;
+                bCurrentAddress <= 0;
+                if (nextState == storeMatrix) begin
+                    //If we're about to go back into storeMatrix, check if newAIn = 1. If it is 0, then skip reading A
+                    if (newAIn == 0) begin
+                        //Set A to the maximum so we never trigger the incrementing/wr_en
+                        aCurrentAddress <= (M * K_in);
+                    end
+                end
+            end
+        endcase
+    end
+
+    //Takes care of nextState logic
+    always_comb begin
+        case (currentState)
+
+            storeMatrix: begin
+                //If we are done filling up both matrices, move onto memRead
+                if ((aCurrentAddress >= ((M * K_in))) && (bCurrentAddress >= ((N * K_in)))) begin
+                    nextState = memRead;
+                    getNewData = 1; //Trigger the other input_mems module to get new data from the AXIS interface in preparation for the next read
+                end else begin
+                    //Otherwise, continue filling up
+                    nextState = storeMatrix;
+                    getNewData = 0;
+                end
+
+            end
+
+            memRead: begin
+                getNewData = 0;
+                if (compute_finished == 1) begin
+                    if (finishedLoading == 1) begin
+                        //As long as the previous stage is done loading, we should change state
+                        localK = K_in;  //Copy the new K into the local memory
+                        nextState = storeMatrix;
+                    end else begin
+                        //If the previous stge is not done loading, just wait for it complete loading
+                        nextState = waitForLoad;
+                    end
+                end else begin
+                    nextState = memRead;
+                end
+            end
+            waitForLoad: begin
+                getNewData = 0;
+                if (finishedLoading == 1) begin
+                        //As long as the previous stage is done loading, we should change state
+                        localK = K_in;  //Copy the new K into the local memory
+                        nextState = storeMatrix;    
+                    end else begin
+                        //If the previous stge is not done loading, just wait for it complete loading
+                        nextState = waitForLoad;
+                    end
+            end
+        endcase
+    end
 
 endmodule
 

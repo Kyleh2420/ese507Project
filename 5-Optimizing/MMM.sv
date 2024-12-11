@@ -5,7 +5,7 @@ module MMM #(
         parameter N = 9,
         parameter MAXK = 8,
         localparam K_BITS = $clog2(MAXK+1),
-        localparam mulStage = 3
+        localparam mulStage = 4
     )(
         input clk,
         input reset,
@@ -51,13 +51,13 @@ module MMM #(
     logic clearAccDelay1,  fifoWriteEnableDelay1;
 
     //Used to pipeline the mac unit
-    logic [2:0] writeCount; //The number of write signals that have been issued
-    logic [5:0] fifoWrEnDelay;
-    logic [5:0] clearAccDelay;
-    logic [3:0] validDelay;
+    logic [3:0] writeCount; //The number of write signals that have been issued
+    logic [6:0] fifoWrEnDelay;
+    logic [6:0] clearAccDelay;
+    logic [4:0] validDelay;
 
 
-    input_mems_buffer #(INW, M, N, MAXK) inputMem(
+    input_mems_buffer2x #(INW, M, N, MAXK) inputMem(
     // input_mems #(INW, M, N, MAXK) inputMem(
         .clk(clk),
         .reset(reset),
@@ -119,30 +119,29 @@ module MMM #(
         // fifoWriteEnableDelay1 <= fifoWriteTrigger;
 
         if(reset == 1) begin
-            for (int i = 5; i >0; i = i-1) begin
+            for (int i = 6; i >0; i = i-1) begin
                 clearAccDelay[i] <= 0;
                 fifoWrEnDelay[i] <= 0;
             end 
         end
 
-        for (int i = 2; i >0; i = i-1) begin
+        for (int i = mulStage; i >0; i = i-1) begin
             clearAccDelay[i-1] <= clearAccDelay[i];
             fifoWrEnDelay[i-1] <= fifoWrEnDelay[i];
         end
 
-        for (int j = 1; j >0; j = j-1) begin
+        for (int j = mulStage-1; j >0; j = j-1) begin
             validDelay[j-1] <= validDelay[j];
         end
 
-        clearAccDelay[2] <= clearAccTrigger;
-        fifoWrEnDelay[2] <= fifoWriteTrigger;
-        validDelay[0] <= validInputTrigger;
+        clearAccDelay[mulStage] <= clearAccTrigger;
+        fifoWrEnDelay[mulStage] <= fifoWriteTrigger;
+        validDelay[mulStage-2] <= validInputTrigger;
 
     end
 
     //Datapath stuff
     always_comb begin: dataPath
-
         case (currentState)
             waitForLoad: begin
                 aAddress = 0;

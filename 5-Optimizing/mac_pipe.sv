@@ -18,10 +18,11 @@ module mac_pipe #(
 	// 	product = in0*in1;
 	// end
 
-	DW02_mult_2_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
+	// DW02_mult_2_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
+	//Works up to 4
+	DW02_mult_4_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
 
-	// DW02_mult_3_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
-
+	//5 does not work...
 	// DW02_mult_6_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, product);
 
     always_ff @ (posedge clk) begin
