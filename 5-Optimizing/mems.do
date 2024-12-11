@@ -5,6 +5,8 @@ add wave -noupdate /MMM_tb/dut/nextState
 add wave -noupdate /MMM_tb/dut/aAddress
 add wave -noupdate /MMM_tb/dut/bAddress
 add wave -noupdate -divider -height 25 INTERFACE
+add wave -noupdate /MMM_tb/dut/inputMem/input_interface/currentState
+add wave -noupdate /MMM_tb/dut/inputMem/input_interface/nextState
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/INW
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/M
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/N
@@ -28,7 +30,6 @@ add wave -noupdate /MMM_tb/dut/inputMem/input_interface/B_data
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/newAOut
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/newA
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/TUSER_K
-add wave -noupdate /MMM_tb/dut/inputMem/input_interface/currentState
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/aCurrentAddress
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/bCurrentAddress
 add wave -noupdate /MMM_tb/dut/inputMem/input_interface/localK
@@ -75,8 +76,12 @@ add wave -noupdate /MMM_tb/dut/inputMem/aAddress
 add wave -noupdate /MMM_tb/dut/inputMem/bAddress
 add wave -noupdate /MMM_tb/dut/inputMem/aData
 add wave -noupdate /MMM_tb/dut/inputMem/bData
+add wave -noupdate /MMM_tb/dut/inputMem/input_interface/matrixA/mem
+add wave -noupdate /MMM_tb/dut/inputMem/input_interface/matrixB/mem
+add wave -noupdate /MMM_tb/dut/inputMem/input_computation/matrixA/mem
+add wave -noupdate /MMM_tb/dut/inputMem/input_computation/matrixB/mem
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {330 ns} 0}
+WaveRestoreCursors {{Cursor 1} {325 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 408
 configure wave -valuecolwidth 100
