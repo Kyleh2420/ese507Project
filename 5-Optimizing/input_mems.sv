@@ -720,7 +720,7 @@ module input_mems_computation2x #(
                 aWriteEnable = 0;
                 bWriteEnable = 0;
             end
-            waitForLoad: begin
+            default: begin
                 matrices_loaded = 0;
                 aAddress = A_read_addr;
                 bAddress = B_read_addr;
@@ -759,10 +759,11 @@ module input_mems_computation2x #(
                     bCurrentAddress <= bCurrentAddress + 1;
                 end
             end
-            memRead, waitForLoad: begin
+            default: begin
                 aCurrentAddress <= 0;
                 bCurrentAddress <= 0;
                 if (nextState == storeMatrix) begin
+                    localK = K_in;  //Copy the new K into the local memory
                     //If we're about to go back into storeMatrix, check if newAIn = 1. If it is 0, then skip reading A
                     if (newAIn == 0) begin
                         //Set A to the maximum so we never trigger the incrementing/wr_en
@@ -795,7 +796,6 @@ module input_mems_computation2x #(
                 if (compute_finished == 1) begin
                     if (finishedLoading == 1) begin
                         //As long as the previous stage is done loading, we should change state
-                        localK = K_in;  //Copy the new K into the local memory
                         nextState = storeMatrix;
                     end else begin
                         //If the previous stge is not done loading, just wait for it complete loading
@@ -805,11 +805,10 @@ module input_mems_computation2x #(
                     nextState = memRead;
                 end
             end
-            waitForLoad: begin
+            default: begin
                 getNewData = 0;
                 if (finishedLoading == 1) begin
                         //As long as the previous stage is done loading, we should change state
-                        localK = K_in;  //Copy the new K into the local memory
                         nextState = storeMatrix;    
                     end else begin
                         //If the previous stge is not done loading, just wait for it complete loading

@@ -29,7 +29,7 @@
             Inclusivity and Diversity" (Refer to article 000036315 at
                         https://solvnetplus.synopsys.com)
 Initializing...
-Current time:       Wed Dec 11 14:48:14 2024
+Current time:       Wed Dec 11 18:19:25 2024
 Hostname:           lab22.ece.stonybrook.edu
 CPU Model:          13th Gen Intel(R) Core(TM) i7-13700
 CPU Details:        Cores = 24 : Sockets = 1 : Cache Size = 30720 KB : Freq = 2.10 GHz
@@ -38,10 +38,10 @@ RAM:                 30 GB (Free   2 GB)
 Swap:                15 GB (Free  14 GB)
 Work Filesystem:    /home/home5 mounted to files:/export/home5
 Tmp Filesystem:     / mounted to /dev/mapper/rhel-root
-Work Disk:          3463 GB (Free 943 GB)
+Work Disk:          3461 GB (Free 938 GB)
 Tmp Disk:           786 GB (Free 283 GB)
 
-CPU Load: 10%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 943 GB, Tmp Disk Free: 283 GB
+CPU Load: 7%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 938 GB, Tmp Disk Free: 283 GB
 ##############################################
 # Setup: fill out the following parameters: name of clock signal, clock period (ns),
 # reset signal name (if used), name of top-level module, name of source file
@@ -73,9 +73,9 @@ source setupdc.tcl
 NangateOpenCellLibrary_typical.db dw_foundation.sldb
 file mkdir work_synth
 date
-Wed Dec 11 14:48:14 2024
+Wed Dec 11 18:19:25 2024
 pid
-3711623
+3798467
 pwd
 /home/home5/khan/ese507/ese507Project/5-Optimizing
 getenv USER
@@ -92,12 +92,12 @@ define_design_lib WORK -path work_synth
 analyze $SRC_FILE -format sverilog
 Running PRESTO HDLC
 Compiling source file ./MMM.sv
-Warning:  ./MMM.sv:40: Using default enum base size of 32. (VER-533)
+Warning:  ./MMM.sv:41: Using default enum base size of 32. (VER-533)
 Compiling source file ./input_mems.sv
 Warning:  ./input_mems.sv:60: Using default enum base size of 32. (VER-533)
 Warning:  ./input_mems.sv:351: Using default enum base size of 32. (VER-533)
-Warning:  ./input_mems.sv:581: Using default enum base size of 32. (VER-533)
-Warning:  ./input_mems.sv:939: Using default enum base size of 32. (VER-533)
+Warning:  ./input_mems.sv:654: Using default enum base size of 32. (VER-533)
+Warning:  ./input_mems.sv:929: Using default enum base size of 32. (VER-533)
 Compiling source file ./mac_pipe.sv
 Compiling source file ./fifo_out.sv
 Presto compilation completed successfully.
@@ -110,53 +110,49 @@ Loading db file '/usr/local/synopsys/syn/U-2022.12-SP7-2/libraries/syn/standard.
   Loading link library 'NangateOpenCellLibrary'
   Loading link library 'gtech'
 Running PRESTO HDLC
-Warning:  ./MMM.sv:203: signed to unsigned conversion occurs. (VER-318)
-Warning:  ./MMM.sv:201: signed to unsigned conversion occurs. (VER-318)
-Warning:  ./MMM.sv:111: signed to unsigned part selection occurs. (VER-318)
-Warning:  ./MMM.sv:137: signed to unsigned part selection occurs. (VER-318)
-Warning:  ./MMM.sv:189: signed to unsigned part selection occurs. (VER-318)
+Warning:  ./MMM.sv:244: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./MMM.sv:242: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./MMM.sv:145: signed to unsigned part selection occurs. (VER-318)
+Warning:  ./MMM.sv:178: signed to unsigned part selection occurs. (VER-318)
+Warning:  ./MMM.sv:230: signed to unsigned part selection occurs. (VER-318)
 
-Statistics for case statements in always block at line 109 in file
+Statistics for case statements in always block at line 144 in file
 	'./MMM.sv'
 ===============================================
 |           Line           |  full/ parallel  |
 ===============================================
-|           111            |    auto/auto     |
+|           145            |    auto/auto     |
 ===============================================
 
-Statistics for case statements in always block at line 133 in file
+Statistics for case statements in always block at line 170 in file
 	'./MMM.sv'
 ===============================================
 |           Line           |  full/ parallel  |
 ===============================================
-|           137            |    auto/auto     |
+|           178            |    auto/auto     |
 ===============================================
 
-Statistics for case statements in always block at line 176 in file
+Statistics for case statements in always block at line 217 in file
 	'./MMM.sv'
 ===============================================
 |           Line           |  full/ parallel  |
 ===============================================
-|           189            |     no/auto      |
+|           230            |     no/auto      |
 ===============================================
 
 Inferred memory devices in process
-	in routine MMM line 93 in file
+	in routine MMM line 113 in file
 		'./MMM.sv'.
-=====================================================================================
-|       Register Name       |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
-=====================================================================================
-|       clearAcc_reg        | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
-|    clearAccDelay1_reg     | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
-|    fifoWriteEnable_reg    | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
-| fifoWriteEnableDelay1_reg | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
-|    clearAccDelay2_reg     | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
-| fifoWriteEnableDelay2_reg | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
-|      validInput_reg       | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
-=====================================================================================
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|  fifoWrEnDelay_reg  | Flip-flop |   5   |  Y  | N  | N  | N  | N  | N  | N  |
+|  clearAccDelay_reg  | Flip-flop |   5   |  Y  | N  | N  | N  | N  | N  | N  |
+|   validDelay_reg    | Flip-flop |   3   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
 
 Inferred memory devices in process
-	in routine MMM line 176 in file
+	in routine MMM line 217 in file
 		'./MMM.sv'.
 =================================================================================
 |     Register Name     |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
@@ -173,50 +169,14 @@ Inferred memory devices in process
 Presto compilation completed successfully. (MMM)
 Elaborated 1 design.
 Current design is now 'MMM'.
-Information: Building the design 'input_mems' instantiated from design 'MMM' with
+Information: Building the design 'input_mems_buffer2x' instantiated from design 'MMM' with
 	the parameters "12,7,9,8". (HDL-193)
-
-Statistics for case statements in always block at line 971 in file
-	'./input_mems.sv'
-===============================================
-|           Line           |  full/ parallel  |
-===============================================
-|           972            |    user/user     |
-===============================================
-
-Statistics for case statements in always block at line 1030 in file
-	'./input_mems.sv'
-===============================================
-|           Line           |  full/ parallel  |
-===============================================
-|           1035           |    user/user     |
-===============================================
-
-Statistics for case statements in always block at line 1119 in file
-	'./input_mems.sv'
-===============================================
-|           Line           |  full/ parallel  |
-===============================================
-|           1129           |    user/user     |
-===============================================
-
-Inferred memory devices in process
-	in routine input_mems_INW12_M7_N9_MAXK8 line 1119 in file
-		'./input_mems.sv'.
-===============================================================================
-|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
-===============================================================================
-|  currentState_reg   | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
-|     localK_reg      | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
-| aCurrentAddress_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
-| bCurrentAddress_reg | Flip-flop |   7   |  Y  | N  | N  | N  | N  | N  | N  |
-===============================================================================
-Presto compilation completed successfully. (input_mems_INW12_M7_N9_MAXK8)
+Presto compilation completed successfully. (input_mems_buffer2x_INW12_M7_N9_MAXK8)
 Information: Building the design 'mac_pipe' instantiated from design 'MMM' with
 	the parameters "12,32". (HDL-193)
 
 Inferred memory devices in process
-	in routine mac_pipe_INW12_OUTW32 line 23 in file
+	in routine mac_pipe_INW12_OUTW32 line 28 in file
 		'./mac_pipe.sv'.
 ===============================================================================
 |    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
@@ -225,7 +185,7 @@ Inferred memory devices in process
 ===============================================================================
 
 Inferred memory devices in process
-	in routine mac_pipe_INW12_OUTW32 line 53 in file
+	in routine mac_pipe_INW12_OUTW32 line 58 in file
 		'./mac_pipe.sv'.
 ===============================================================================
 |    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
@@ -267,44 +227,88 @@ Inferred memory devices in process
 |    capacity_reg     | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
 ===============================================================================
 Presto compilation completed successfully. (fifo_out_OUTW32_DEPTH9)
-Information: Building the design 'memory' instantiated from design 'input_mems_INW12_M7_N9_MAXK8' with
-	the parameters "12,@28206b3a32393020743a2028206b3a31373820743a31333a22696e74254e624d764f26262220693a20693a3220292028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a36202920292000@". (HDL-193)
+Information: Building the design 'input_mems_interface' instantiated from design 'input_mems_buffer2x_INW12_M7_N9_MAXK8' with
+	the parameters "12,7,9,8". (HDL-193)
+
+Statistics for case statements in always block at line 93 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|            94            |    user/user     |
+===============================================
+
+Statistics for case statements in always block at line 152 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           158            |    user/user     |
+===============================================
+
+Statistics for case statements in always block at line 242 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           252            |    user/user     |
+===============================================
 
 Inferred memory devices in process
-	in routine memory_WIDTH12_SIZE64 line 19 in file
+	in routine input_mems_interface_INW12_M7_N9_MAXK8 line 242 in file
 		'./input_mems.sv'.
 ===============================================================================
 |    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
 ===============================================================================
-|    data_out_reg     | Flip-flop |  12   |  Y  | N  | N  | N  | N  | N  | N  |
-|       mem_reg       | Flip-flop |  768  |  Y  | N  | N  | N  | N  | N  | N  |
+|  currentState_reg   | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+|     localA_reg      | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+| aCurrentAddress_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+| bCurrentAddress_reg | Flip-flop |   7   |  Y  | N  | N  | N  | N  | N  | N  |
+|     localK_reg      | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
 ===============================================================================
-Statistics for MUX_OPs
-==============================================================
-|     block name/line      | Inputs | Outputs | # sel inputs |
-==============================================================
-| memory_WIDTH12_SIZE64/20 |   64   |   12    |      6       |
-==============================================================
-Presto compilation completed successfully. (memory_WIDTH12_SIZE64)
-Information: Building the design 'memory' instantiated from design 'input_mems_INW12_M7_N9_MAXK8' with
-	the parameters "12,@28206b3a32393020743a2028206b3a31373820743a31333a22696e74254e624d764f26262220693a20693a3220292028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a37202920292000@". (HDL-193)
+Presto compilation completed successfully. (input_mems_interface_INW12_M7_N9_MAXK8)
+Information: Building the design 'input_mems_computation2x' instantiated from design 'input_mems_buffer2x_INW12_M7_N9_MAXK8' with
+	the parameters "12,7,9,8". (HDL-193)
+Warning:  ./input_mems.sv:697: signed to unsigned part selection occurs. (VER-318)
+
+Statistics for case statements in always block at line 691 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           697            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 737 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           751            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 778 in file
+	'./input_mems.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           779            |    auto/auto     |
+===============================================
 
 Inferred memory devices in process
-	in routine memory_WIDTH12_SIZE128 line 19 in file
+	in routine input_mems_computation2x_INW12_M7_N9_MAXK8 line 737 in file
 		'./input_mems.sv'.
-===============================================================================
-|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
-===============================================================================
-|    data_out_reg     | Flip-flop |  12   |  Y  | N  | N  | N  | N  | N  | N  |
-|       mem_reg       | Flip-flop | 1536  |  Y  | N  | N  | N  | N  | N  | N  |
-===============================================================================
-Statistics for MUX_OPs
-===============================================================
-|     block name/line       | Inputs | Outputs | # sel inputs |
-===============================================================
-| memory_WIDTH12_SIZE128/20 |  128   |   12    |      7       |
-===============================================================
-Presto compilation completed successfully. (memory_WIDTH12_SIZE128)
+======================================================================================
+|       Register Name        |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+======================================================================================
+| aCurrentAddress_delay1_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+| bCurrentAddress_delay1_reg | Flip-flop |   7   |  Y  | N  | N  | N  | N  | N  | N  |
+|    bCurrentAddress_reg     | Flip-flop |   7   |  Y  | N  | N  | N  | N  | N  | N  |
+|      currentState_reg      | Flip-flop |  32   |  Y  | N  | N  | N  | N  | N  | N  |
+|    aCurrentAddress_reg     | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|         localK_reg         | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+======================================================================================
+Presto compilation completed successfully. (input_mems_computation2x_INW12_M7_N9_MAXK8)
 Information: Building the design 'memory_dual_port' instantiated from design 'fifo_out_OUTW32_DEPTH9' with
 	the parameters "32,9". (HDL-193)
 
@@ -318,6 +322,32 @@ Inferred memory devices in process
 |       mem_reg       | Flip-flop |  288  |  Y  | N  | N  | N  | N  | N  | N  |
 ===============================================================================
 Presto compilation completed successfully. (memory_dual_port_WIDTH32_SIZE9)
+Information: Building the design 'memory' instantiated from design 'input_mems_interface_INW12_M7_N9_MAXK8' with
+	the parameters "12,@28206b3a32373320743a20693a2028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a3720292028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a38202920292000@". (HDL-193)
+
+Inferred memory devices in process
+	in routine memory_WIDTH12_SIZE56 line 19 in file
+		'./input_mems.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|    data_out_reg     | Flip-flop |  12   |  Y  | N  | N  | N  | N  | N  | N  |
+|       mem_reg       | Flip-flop |  672  |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully. (memory_WIDTH12_SIZE56)
+Information: Building the design 'memory' instantiated from design 'input_mems_interface_INW12_M7_N9_MAXK8' with
+	the parameters "12,@28206b3a32373320743a20693a2028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a3820292028206b3a31383220743a33353a227369676e6564617272617928302533312530256c6f67696329255938315a6e48262220693a20763a39202920292000@". (HDL-193)
+
+Inferred memory devices in process
+	in routine memory_WIDTH12_SIZE72 line 19 in file
+		'./input_mems.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|    data_out_reg     | Flip-flop |  12   |  Y  | N  | N  | N  | N  | N  | N  |
+|       mem_reg       | Flip-flop |  864  |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully. (memory_WIDTH12_SIZE72)
 1
 ###### CLOCKS AND PORTS #######
 set CLK_PORT [get_ports $CLK_NAME]
@@ -338,9 +368,8 @@ set_max_area 0
 ###### RUN #####
 compile_ultra
 Information: Performing leakage power optimization. (PWR-850)
-CPU Load: 10%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 943 GB, Tmp Disk Free: 283 GB
-Analyzing: "/home/home4/pmilder/ese507/synthesis/lib/NangateOpenCellLibrary_typical.db"
-Library analysis succeeded.
+CPU Load: 7%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 938 GB, Tmp Disk Free: 283 GB
+Alib files are up-to-date.
 Information: Evaluating DesignWare library utilization. (UISN-27)
 
 ============================================================================
@@ -359,23 +388,25 @@ Information: Evaluating DesignWare library utilization. (UISN-27)
 | Design Information                                      | Value                                  |
 ====================================================================================================
 | Number of Scenarios                                     | 0                                      |
-| Leaf Cell Count                                         | 3698                                   |
-| Number of User Hierarchies                              | 6                                      |
-| Sequential Cell Count                                   | 2798                                   |
+| Leaf Cell Count                                         | 7001                                   |
+| Number of User Hierarchies                              | 10                                     |
+| Sequential Cell Count                                   | 3659                                   |
 | Macro Count                                             | 0                                      |
 | Number of Power Domains                                 | 0                                      |
 | Number of Path Groups                                   | 2                                      |
 | Number of VT Class                                      | 0                                      |
 | Number of Clocks                                        | 1                                      |
-| Number of Dont Touch Cells                              | 199                                    |
+| Number of Dont Touch Cells                              | 485                                    |
 | Number of Dont Touch Nets                               | 0                                      |
 | Number of Size Only Cells                               | 0                                      |
 | Design with UPF Data                                    | false                                  |
 ====================================================================================================
 Information: Sequential output inversion is enabled.  SVF file must be used for formal verification. (OPT-1208)
 
-Information: There are 18 potential problems in your design. Please run 'check_design' for more information. (LINT-99)
+Information: There are 25 potential problems in your design. Please run 'check_design' for more information. (LINT-99)
 
+Information: Uniquified 2 instances of design 'memory_WIDTH12_SIZE56'. (OPT-1056)
+Information: Uniquified 2 instances of design 'memory_WIDTH12_SIZE72'. (OPT-1056)
   Simplifying Design 'MMM'
 
 Loaded alib file './alib-52/NangateOpenCellLibrary_typical.db.alib'
@@ -383,84 +414,98 @@ Loaded alib file './alib-52/NangateOpenCellLibrary_typical.db.alib'
 Information: Ungrouping hierarchy inputMem before Pass 1 (OPT-776)
 Information: Ungrouping hierarchy mac before Pass 1 (OPT-776)
 Information: Ungrouping hierarchy fifo before Pass 1 (OPT-776)
-Information: Ungrouping hierarchy inputMem/matrixA before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy inputMem/input_interface before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy inputMem/input_computation before Pass 1 (OPT-776)
 Information: Ungrouping hierarchy fifo/myMemInst before Pass 1 (OPT-776)
-Information: Ungrouping 5 of 7 hierarchies before Pass 1 (OPT-775)
-CPU Load: 11%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 943 GB, Tmp Disk Free: 283 GB
+Information: Ungrouping hierarchy inputMem/input_interface/matrixA before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy inputMem/input_interface/matrixB before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy inputMem/input_computation/matrixA before Pass 1 (OPT-776)
+Information: Ungrouping hierarchy inputMem/input_computation/matrixB before Pass 1 (OPT-776)
+Information: Ungrouping 10 of 11 hierarchies before Pass 1 (OPT-775)
+CPU Load: 9%, Ram Free: 1 GB, Swap Free: 14 GB, Work Disk Free: 938 GB, Tmp Disk Free: 283 GB
 Information: State dependent leakage is now switched from on to off.
 
   Beginning Pass 1 Mapping
   ------------------------
-  Processing 'memory_WIDTH12_SIZE128'
   Processing 'MMM'
 Information: Added key list 'DesignWare' to design 'MMM'. (DDB-72)
-Information: The finite state machine currentState_reg has been extracted. (FSM_EX-144)
-Design : MMM
-Filename : /home/home5/khan/ese507/ese507Project/5-Optimizing/MMM.sv
-Clock             : clk        
-Asynchronous Reset: Unspecified
-
-
-Current Encoding (length/style)     : 32 / NONE
-State Vector: { currentState_reg[31] currentState_reg[30] currentState_reg[29] currentState_reg[28] currentState_reg[27] currentState_reg[26] currentState_reg[25] currentState_reg[24] currentState_reg[23] currentState_reg[22] currentState_reg[21] currentState_reg[20] currentState_reg[19] currentState_reg[18] currentState_reg[17] currentState_reg[16] currentState_reg[15] currentState_reg[14] currentState_reg[13] currentState_reg[12] currentState_reg[11] currentState_reg[10] currentState_reg[9] currentState_reg[8] currentState_reg[7] currentState_reg[6] currentState_reg[5] currentState_reg[4] currentState_reg[3] currentState_reg[2] currentState_reg[1] currentState_reg[0] }
-
-
-FSM_COMPLETE : FALSE
-Re-Encoding style     : NONE
-
-
-State Encodings and Order: 
-
-waitForLoad : 00000000000000000000000000000000
-compute    : 00000000000000000000000000000001
-stall      : 00000000000000000000000000000010
-Default Next State : waitForLoad
-
-Information: The register 'currentState_reg[31]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[30]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[29]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[28]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[27]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[26]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[25]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[24]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[23]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[22]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[21]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[20]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[19]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[18]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[17]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[16]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[15]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[14]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[13]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[12]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[11]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[10]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[9]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[8]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[7]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[6]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[5]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[4]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[3]' will be removed. (OPT-1207)
-Information: The register 'currentState_reg[2]' will be removed. (OPT-1207)
+Warning: The output function for the state compute is too large to be represented. (FSM_EX-141)
+Warning: The extraction is too expensive. (FSM_EX-127)
+Information: The finite state machine currentState_reg cannot be extracted. (FSM_EX-145)
+Information: The register 'inputMem/input_computation/currentState_reg[31]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[30]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[29]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[28]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[27]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[26]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[25]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[24]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[23]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[22]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[21]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[20]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[19]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[18]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[17]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[16]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[15]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[14]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[13]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[12]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[11]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[10]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[9]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[8]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[7]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[6]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[5]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[4]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[3]' is a constant and will be removed. (OPT-1206)
+Information: The register 'inputMem/input_computation/currentState_reg[2]' is a constant and will be removed. (OPT-1206)
  Implement Synthetic for 'MMM'.
-  Processing 'MMM_DW02_mult_2_stage_J2_0'
+  Processing 'MMM_DW02_mult_4_stage_J1_0'
 Information: Command 'do_operand_isolation' is obsolete and is being ignored.  Please refer to the replacement command 'set power_enable_datapath_gating true' instead. (INFO-118)
-CPU Load: 11%, Ram Free: 3 GB, Swap Free: 14 GB, Work Disk Free: 943 GB, Tmp Disk Free: 283 GB
+CPU Load: 10%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 938 GB, Tmp Disk Free: 283 GB
 
   Updating timing information
 Information: Updating design information... (UID-85)
+Information: The register 'currentState_reg[31]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[30]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[29]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[28]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[27]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[26]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[25]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[24]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[23]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[22]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[21]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[20]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[19]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[18]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[17]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[16]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[15]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[14]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[13]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[12]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[11]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[10]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[9]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[8]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[7]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[6]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[5]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[4]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[3]' is a constant and will be removed. (OPT-1206)
+Information: The register 'currentState_reg[2]' is a constant and will be removed. (OPT-1206)
 
   Beginning Mapping Optimizations  (Ultra High effort)
   -------------------------------
-Information: Ungrouping hierarchy inputMem/matrixB/C3250 'memory_WIDTH12_SIZE128_MUX_OP_128_7_12' #insts = 1121. (OPT-777)
-Information: Checking pipeline property of cell mac/multinstance (design MMM_DW02_mult_2_stage_J2_0). (RTDC-137)
-Information: cell mac/multinstance (design MMM_DW02_mult_2_stage_J2_0) is a pipeline. (RTDC-139)
+Information: Checking pipeline property of cell mac/multinstance (design MMM_DW02_mult_4_stage_J1_0). (RTDC-137)
+Information: cell mac/multinstance (design MMM_DW02_mult_4_stage_J1_0) is a pipeline. (RTDC-139)
   Mapping Optimization (Phase 1)
-  Retiming MMM_DW02_mult_2_stage_J2_0 (mac/multinstance)
+  Retiming MMM_DW02_mult_4_stage_J1_0 (mac/multinstance)
   Preferred flip-flop is DFFS_X1 with setup = 0.04
 
 
@@ -477,26 +522,23 @@ Information: cell mac/multinstance (design MMM_DW02_mult_2_stage_J2_0) is a pipe
   ... minimum area retiming step 3 done.
   Beginning final register move ...
   ... final register move done.
-  Lower bound estimate = 1.34
-  Critical path length = 1.34
+  Lower bound estimate = 0.87
+  Critical path length = 0.87
   Clock correction = 0.13 (clock-to-Q delay = 0.09, setup = 0.04, uncertainty = 0.00)
   Mapping Optimization (Phase 2)
+Information: Command 'do_operand_isolation' is obsolete and is being ignored.  Please refer to the replacement command 'set power_enable_datapath_gating true' instead. (INFO-118)
 
                                   TOTAL                                                
    ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
     TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
   --------- --------- --------- --------- --------- ------------------------- ---------
-    0:00:22   28846.9      0.46     942.6     329.7 inputMem/matrixB/mem_reg[74][0]/D 775125.3750
-    0:00:22   28846.9      0.46     942.6     329.7 inputMem/matrixB/mem_reg[74][0]/D 775125.3750
-    0:00:23   28703.8      0.42     820.6     182.6 inputMem/matrixA/data_out_reg[2]/D 764737.9375
-Information: Command 'do_operand_isolation' is obsolete and is being ignored.  Please refer to the replacement command 'set power_enable_datapath_gating true' instead. (INFO-118)
-    0:00:23   28689.4      0.42     816.8     182.6                           764025.1875
-    0:00:23   28668.4      0.54     822.5     308.5                           763488.8125
+    0:00:30   35921.2      0.39     713.2     185.2                           952305.5625
+    0:00:30   35881.3      0.48     755.2     255.2                           951200.8125
 
   Beginning Constant Register Removal
   -----------------------------------
-    0:00:23   29111.6      0.77     897.3     183.8                           786914.0000
-    0:00:24   29110.0      0.77     898.5     183.8                           786875.4375
+    0:00:30   36194.1      0.77     770.6     205.3                           967736.2500
+    0:00:31   36193.0      0.77     782.5     205.3                           967713.6250
 
   Beginning Global Optimizations
   ------------------------------
@@ -539,37 +581,37 @@ Information: Command 'do_operand_isolation' is obsolete and is being ignored.  P
 
   Beginning Delay Optimization
   ----------------------------
-    0:00:26   25814.8      0.49     732.0     198.8                           620683.5625
-    0:00:33   25215.5      0.27     448.8     189.3                           582441.8750
-    0:00:33   25215.5      0.27     448.8     189.3                           582441.8750
-    0:00:33   25225.6      0.27     448.8     189.3                           582504.5000
-    0:00:33   25225.6      0.27     448.8     189.3                           582504.5000
-    0:00:33   25225.6      0.27     448.8     189.3                           582504.5000
+    0:00:33   29447.5      0.48     689.5     115.5                           621217.0000
+    0:00:36   29560.6      0.33     531.7      22.5                           625175.8125
+    0:00:36   29560.6      0.33     531.7      22.5                           625175.8125
+    0:00:37   29568.6      0.33     493.4      22.5                           655842.8750
+    0:00:38   29567.2      0.33     493.3      22.5                           655805.3750
+    0:00:38   29567.2      0.33     493.3      22.5                           655805.3750
 
   Beginning WLM Backend Optimization
   --------------------------------------
-    0:00:35   23400.6      0.27     443.3     161.7                           489931.7188
-    0:00:36   23413.3      0.27     420.6     107.3                           490484.8750
-    0:00:36   23413.3      0.27     420.6     107.3                           490484.8750
-    0:00:37   23394.2      0.27     419.4      86.1                           489776.5312
-    0:00:37   23394.2      0.27     419.4      86.1                           489776.5312
-    0:00:37   23410.9      0.25     362.8      87.8                           490494.0000
-    0:00:37   23410.9      0.25     362.8      87.8                           490494.0000
-    0:00:37   23410.9      0.25     362.8      87.8                           490494.0000
-    0:00:37   23410.9      0.25     362.8      87.8                           490494.0000
-    0:00:37   23410.9      0.25     362.8      87.8                           490494.0000
-    0:00:37   23410.9      0.25     362.8      87.8                           490494.0000
-    0:00:45   23452.4      0.22     357.6      87.0                           491806.6250
-    0:00:45   23452.4      0.22     357.6      87.0                           491806.6250
-    0:00:45   23467.6      0.22     358.7      87.0                           492359.0625
-    0:00:45   23467.6      0.22     358.7      87.0                           492359.0625
-    0:00:46   23460.4      0.21     358.2      87.0                           491963.9062
-    0:00:46   23460.4      0.21     358.2      87.0                           491963.9062
-    0:00:46   23485.1      0.21     357.6      87.0                           492646.9688
-    0:00:46   23485.1      0.21     357.6      87.0                           492646.9688
-    0:00:47   23504.0      0.21     356.9      59.5                           493793.1562
-    0:00:47   23504.0      0.21     356.9      59.5                           493793.1562
-    0:00:47   23583.8      0.21     354.3      58.3                           496102.3750
+    0:00:39   29353.9      0.33     474.7      22.5                           646746.3125
+    0:00:40   29364.5      0.33     449.5      22.5                           647707.9375
+    0:00:40   29364.5      0.33     449.5      22.5                           647707.9375
+    0:00:40   29260.8      0.34     451.1      22.5                           638333.3125
+    0:00:40   29260.8      0.34     451.1      22.5                           638333.3125
+    0:00:41   29306.8      0.29     412.2      22.5                           639863.3125
+    0:00:41   29306.8      0.29     412.2      22.5                           639863.3125
+    0:00:41   29307.1      0.28     412.1      22.5                           639905.0625
+    0:00:41   29307.1      0.28     412.1      22.5                           639905.0625
+    0:00:41   29307.1      0.28     412.1      22.5                           639905.0625
+    0:00:41   29307.1      0.28     412.1      22.5                           639905.0625
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
 
 
   Beginning Design Rule Fixing  (max_capacitance)
@@ -579,13 +621,13 @@ Information: Command 'do_operand_isolation' is obsolete and is being ignored.  P
    ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
     TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
   --------- --------- --------- --------- --------- ------------------------- ---------
-    0:00:47   23583.8      0.21     354.3      58.3                           496102.3750
+    0:00:43   29353.9      0.26     388.2      20.0                           642053.3750
   Global Optimization (Phase 32)
   Global Optimization (Phase 33)
   Global Optimization (Phase 34)
-    0:00:48   23619.2      0.20     332.0       0.0 inputMem/matrixB/data_out_reg[0]/D 497247.1250
-    0:00:48   23625.9      0.20     331.6       0.0                           497484.0625
-    0:00:48   23638.6      0.20     328.3       0.0                           497835.6250
+    0:00:44   29407.4      0.22     276.7       0.0 inputMem/input_computation/matrixA/data_out_reg[1]/D 643598.6250
+    0:00:44   29414.8      0.22     273.9       0.0                           643778.4375
+    0:00:45   29417.7      0.22     257.3       0.0                           643887.8750
 
 
   Beginning Leakage Power Optimization  (max_leakage_power 0)
@@ -595,55 +637,54 @@ Information: Command 'do_operand_isolation' is obsolete and is being ignored.  P
    ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
     TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
   --------- --------- --------- --------- --------- ------------------------- ---------
-    0:00:48   23638.6      0.20     328.3       0.0                           497835.6250
-    0:00:49   24051.2      0.19     318.0       0.0                           516329.0938
-    0:00:49   24051.2      0.19     318.0       0.0                           516329.0938
-    0:00:49   24051.2      0.19     318.0       0.0                           516329.0938
-    0:00:49   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:49   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:50   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:50   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:50   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:50   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:50   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:50   23954.1      0.19     319.9       0.0                           510379.7188
-    0:00:51   23959.9      0.18     321.5       2.2                           510768.1875
-    0:00:51   23959.9      0.18     321.5       2.2                           510768.1875
-    0:00:51   23967.1      0.18     320.9       2.2                           510947.4062
-    0:00:51   23967.1      0.18     320.9       2.2                           510947.4062
-    0:00:52   24050.7      0.17     312.1       2.2                           516288.9375
-    0:00:52   24050.7      0.17     312.1       2.2                           516288.9375
-    0:00:52   24050.7      0.17     312.1       2.2                           516288.9375
-    0:00:52   24050.7      0.17     312.1       2.2                           516288.9375
-    0:00:52   24050.7      0.17     312.1       2.2                           516288.9375
-    0:00:52   24050.7      0.17     312.1       2.2                           516288.9375
-    0:00:52   24050.7      0.17     312.1       2.2                           516288.9375
+    0:00:45   29417.7      0.22     257.3       0.0                           643887.8750
+    0:00:46   29453.9      0.20     237.4       0.0 inputMem/input_computation/matrixA/mem_reg[8][9]/D 644878.8750
+    0:00:46   29480.5      0.20     236.8       0.0                           645584.1250
+    0:00:46   29480.5      0.20     236.8       0.0                           645584.1250
+    0:00:46   29480.5      0.20     236.8       0.0                           645584.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:47   29464.8      0.20     236.5       0.0                           644007.1250
+    0:00:49   29574.4      0.19     226.9       1.9                           650315.6250
+    0:00:49   29574.4      0.19     226.9       1.9                           650315.6250
+    0:00:50   29648.6      0.19     225.2       1.9                           652364.8125
+    0:00:50   29648.6      0.19     225.2       1.9                           652364.8125
+    0:00:51   29653.4      0.19     225.3       1.9                           652455.1250
+    0:00:51   29653.4      0.19     225.3       1.9                           652455.1250
+    0:00:52   29653.4      0.19     225.3       1.9                           652455.1250
+    0:00:52   29653.4      0.19     225.3       1.9                           652455.1250
+    0:00:52   29653.4      0.19     225.3       1.9                           652455.1250
+    0:00:52   29653.4      0.19     225.3       1.9                           652455.1250
+    0:00:53   29653.4      0.19     225.3       1.9                           652455.1250
 
                                   TOTAL                                                
    ELAPSED            WORST NEG   SETUP    DESIGN                              LEAKAGE 
     TIME      AREA      SLACK     COST    RULE COST         ENDPOINT            POWER  
   --------- --------- --------- --------- --------- ------------------------- ---------
-    0:00:52   24045.6      0.17     312.1       2.2                           516184.4688
-    0:00:53   23520.0      0.18     322.0       2.2                           491726.4062
-    0:00:53   23547.6      0.18     307.0       2.2                           492462.0000
-    0:00:53   23547.6      0.18     307.0       2.2                           492462.0000
-    0:00:54   23545.3      0.18     306.9       2.2                           492343.0312
-    0:00:55   23364.1      0.17     294.1       0.0 mac/multinstance/clk_r_REG26_S1/D 487615.7812
-    0:00:55   23405.9      0.16     251.6       0.0 inputMem/matrixA/data_out_reg[11]/D 489079.1562
-    0:00:56   23441.5      0.15     247.6       0.0 inputMem/matrixA/data_out_reg[11]/D 490330.3125
-    0:00:56   23470.2      0.14     231.1       0.0 inputMem/matrixA/mem_reg[21][7]/D 491207.7500
-    0:00:57   23501.9      0.14     227.0       0.0 inputMem/matrixB/data_out_reg[2]/D 491986.0000
-    0:00:57   23535.9      0.13     221.3       0.0 inputMem/matrixA/data_out_reg[0]/D 492927.1875
-    0:00:58   23548.4      0.13     214.0       0.0 inputMem/matrixB/data_out_reg[7]/D 493390.7500
-    0:00:58   23578.0      0.13     207.1       0.0                           494208.0625
-    0:01:00   23601.6      0.12     202.2       0.0                           495508.1562
-    0:01:00   23601.6      0.12     202.2       0.0                           495508.1562
-    0:01:03   23601.1      0.12     199.9       0.0                           495528.7188
-    0:01:03   23602.4      0.12     199.2       0.0                           495659.0312
-    0:01:03   23602.4      0.12     199.2       0.0                           495659.0312
-    0:01:03   23602.4      0.12     199.2       0.0                           495659.0312
-    0:01:03   23440.2      0.12     197.1       0.0                           484934.6250
-CPU Load: 12%, Ram Free: 3 GB, Swap Free: 14 GB, Work Disk Free: 943 GB, Tmp Disk Free: 283 GB
+    0:00:53   29653.4      0.19     225.3       1.9                           652455.1250
+    0:00:54   29270.1      0.20     270.0       0.0                           633240.6875
+    0:00:54   29255.5      0.19     270.4       0.0                           632958.8750
+    0:00:54   29255.5      0.19     270.4       0.0                           632958.8750
+    0:00:54   29291.1      0.19     258.6       0.0                           635158.3750
+    0:00:55   29206.5      0.19     250.1       0.0                           631740.2500
+    0:00:56   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:56   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:57   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:57   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:57   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:57   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:57   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:57   29238.7      0.19     249.2      25.1                           633293.9375
+    0:00:58   29247.0      0.19     239.5      25.1                           633816.3125
+    0:00:58   29247.0      0.19     239.5      25.1                           633816.3125
+    0:00:58   29247.0      0.19     239.5      25.1                           633816.3125
+    0:00:58   28672.7      0.19     238.7      25.1                           595597.7500
+CPU Load: 11%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 938 GB, Tmp Disk Free: 283 GB
 Loading db file '/home/home4/pmilder/ese507/synthesis/lib/NangateOpenCellLibrary_typical.db'
 
 
@@ -653,10 +694,10 @@ Note: Symbol # after min delay cost means estimated hold TNS across all active s
   Optimization Complete
   ---------------------
 Warning: Design 'MMM' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
-     Net 'mac/multinstance/CLK': 2804 load(s), 1 driver(s)
+     Net 'clk': 3697 load(s), 1 driver(s)
 Information: State dependent leakage is now switched from off to on.
 Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
-CPU Load: 11%, Ram Free: 3 GB, Swap Free: 14 GB, Work Disk Free: 943 GB, Tmp Disk Free: 283 GB
+CPU Load: 11%, Ram Free: 2 GB, Swap Free: 14 GB, Work Disk Free: 938 GB, Tmp Disk Free: 283 GB
 Information: Total number of MV cells in the design.
 ----------------------------------------------------------------------------------------------------
  MV Cells                                           Total Number                                   
@@ -683,7 +724,7 @@ report_area
 Report : area
 Design : MMM
 Version: U-2022.12-SP7-2
-Date   : Wed Dec 11 14:49:49 2024
+Date   : Wed Dec 11 18:20:25 2024
 ****************************************
 
 Information: Updating design information... (UID-85)
@@ -692,22 +733,22 @@ Library(s) Used:
 
     NangateOpenCellLibrary (File: /home/home4/pmilder/ese507/synthesis/lib/NangateOpenCellLibrary_typical.db)
 
-Number of ports:                          138
-Number of nets:                         13441
-Number of cells:                        13138
-Number of combinational cells:          10323
-Number of sequential cells:              2804
+Number of ports:                          105
+Number of nets:                         14494
+Number of cells:                        14189
+Number of combinational cells:          10486
+Number of sequential cells:              3697
 Number of macros/black boxes:               0
-Number of buf/inv:                       3339
+Number of buf/inv:                       2467
 Number of references:                      54
 
-Combinational area:              10716.076187
-Buf/Inv area:                     1912.008009
-Noncombinational area:           12724.109544
+Combinational area:              11693.626233
+Buf/Inv area:                     1448.370005
+Noncombinational area:           16979.045425
 Macro/Black Box area:                0.000000
 Net Interconnect area:      undefined  (Wire load has zero net area)
 
-Total cell area:                 23440.185731
+Total cell area:                 28672.671658
 Total area:                 undefined
 1
 report_power
@@ -717,7 +758,7 @@ Report : power
         -analysis_effort low
 Design : MMM
 Version: U-2022.12-SP7-2
-Date   : Wed Dec 11 14:49:49 2024
+Date   : Wed Dec 11 18:20:25 2024
 ****************************************
 
 
@@ -748,12 +789,12 @@ Attributes
 i - Including register clock pin internal power
 
 
-  Cell Internal Power  =  17.3486 mW   (98%)
-  Net Switching Power  = 276.4005 uW    (2%)
+  Cell Internal Power  =  23.6664 mW   (99%)
+  Net Switching Power  = 235.3992 uW    (1%)
                          ---------
-Total Dynamic Power    =  17.6250 mW  (100%)
+Total Dynamic Power    =  23.9018 mW  (100%)
 
-Cell Leakage Power     = 431.1500 uW
+Cell Leakage Power     = 517.8163 uW
 
 
                  Internal         Switching           Leakage            Total
@@ -762,12 +803,12 @@ Power Group      Power            Power               Power              Power  
 io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
-clock_network  1.7072e+04            0.0000            0.0000        1.7072e+04  (  94.55%)  i
-register          84.9707           38.8782        2.1819e+05          342.0591  (   1.89%)
+clock_network  2.3547e+04            0.0000            0.0000        2.3547e+04  (  96.42%)  i
+register          44.3516           59.4870        3.0358e+05          407.3980  (   1.67%)
 sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
-combinational    191.3807          237.5223        2.1296e+05          641.8665  (   3.55%)
+combinational     75.5422          175.9136        2.1424e+05          465.6961  (   1.91%)
 --------------------------------------------------------------------------------------------------
-Total          1.7349e+04 uW       276.4005 uW     4.3115e+05 nW     1.8056e+04 uW
+Total          2.3667e+04 uW       235.4006 uW     5.1782e+05 nW     2.4420e+04 uW
 1
 report_timing
  
@@ -778,7 +819,7 @@ Report : timing
         -max_paths 1
 Design : MMM
 Version: U-2022.12-SP7-2
-Date   : Wed Dec 11 14:49:49 2024
+Date   : Wed Dec 11 18:20:25 2024
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -786,9 +827,9 @@ Date   : Wed Dec 11 14:49:49 2024
 Operating Conditions: typical   Library: NangateOpenCellLibrary
 Wire Load Model Mode: top
 
-  Startpoint: index_reg[0]
+  Startpoint: inputMem/input_computation/localK_reg[0]
               (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: inputMem/matrixB/mem_reg[21][0]
+  Endpoint: inputMem/input_computation/matrixA/mem_reg[10][5]
             (rising edge-triggered flip-flop clocked by clk)
   Path Group: clk
   Path Type: max
@@ -801,40 +842,42 @@ Wire Load Model Mode: top
   --------------------------------------------------------------------------
   clock clk (rise edge)                                   0.00       0.00
   clock network delay (ideal)                             0.00       0.00
-  index_reg[0]/CK (DFF_X1)                                0.00 #     0.00 r
-  index_reg[0]/Q (DFF_X1)                                 0.09       0.09 f
-  U4021/ZN (AND2_X1)                                      0.04       0.13 f
-  U5533/ZN (NAND2_X1)                                     0.03       0.16 r
-  U4130/ZN (AND3_X1)                                      0.06       0.21 r
-  U4216/ZN (OAI21_X1)                                     0.03       0.24 f
-  U5537/ZN (AOI211_X1)                                    0.08       0.32 r
-  U5538/ZN (NOR3_X1)                                      0.03       0.35 f
-  U8820/CO (FA_X1)                                        0.10       0.45 f
-  U4541/ZN (NAND2_X1)                                     0.03       0.48 r
-  U4270/ZN (AND3_X1)                                      0.05       0.54 r
-  U4343/ZN (XNOR2_X1)                                     0.05       0.59 r
-  U5542/ZN (OAI21_X1)                                     0.03       0.63 f
-  inputMem/matrixB/addr[6] (memory_WIDTH12_SIZE128)       0.00       0.63 f
-  inputMem/matrixB/U210/Z (BUF_X2)                        0.05       0.67 f
-  inputMem/matrixB/U209/ZN (INV_X1)                       0.04       0.72 r
-  inputMem/matrixB/U1229/ZN (NAND3_X2)                    0.08       0.80 f
-  inputMem/matrixB/U4844/ZN (OR2_X1)                      0.12       0.92 f
-  inputMem/matrixB/U4845/ZN (INV_X2)                      0.09       1.00 r
-  inputMem/matrixB/U4868/ZN (OAI22_X1)                    0.05       1.05 f
-  inputMem/matrixB/U4869/ZN (INV_X1)                      0.03       1.08 r
-  inputMem/matrixB/mem_reg[21][0]/D (DFF_X1)              0.01       1.09 r
-  data arrival time                                                  1.09
+  inputMem/input_computation/localK_reg[0]/CK (DFF_X1)
+                                                          0.00 #     0.00 r
+  inputMem/input_computation/localK_reg[0]/QN (DFF_X1)
+                                                          0.07       0.07 f
+  U11671/ZN (NOR3_X2)                                     0.09       0.16 r
+  intadd_0/U4/CO (FA_X1)                                  0.08       0.24 r
+  intadd_0/U3/S (FA_X1)                                   0.12       0.36 f
+  U12886/ZN (OR2_X1)                                      0.06       0.42 f
+  U12888/ZN (NAND2_X1)                                    0.03       0.45 r
+  U11304/ZN (NAND2_X1)                                    0.03       0.48 f
+  U11303/ZN (NAND2_X1)                                    0.03       0.50 r
+  intadd_0/U2/CO (FA_X1)                                  0.06       0.57 r
+  U11443/ZN (XNOR2_X1)                                    0.06       0.63 r
+  U11444/ZN (OR2_X1)                                      0.05       0.68 r
+  U11436/ZN (AND3_X2)                                     0.07       0.75 r
+  U16023/ZN (NAND2_X1)                                    0.04       0.79 f
+  U10537/ZN (OR2_X1)                                      0.08       0.87 f
+  U10892/ZN (OR2_X1)                                      0.11       0.98 f
+  U16504/ZN (INV_X2)                                      0.09       1.07 r
+  U16517/ZN (OAI22_X1)                                    0.05       1.11 f
+  U16518/ZN (INV_X1)                                      0.03       1.15 r
+  inputMem/input_computation/matrixA/mem_reg[10][5]/D (DFF_X1)
+                                                          0.01       1.15 r
+  data arrival time                                                  1.15
 
   clock clk (rise edge)                                   1.00       1.00
   clock network delay (ideal)                             0.00       1.00
-  inputMem/matrixB/mem_reg[21][0]/CK (DFF_X1)             0.00       1.00 r
+  inputMem/input_computation/matrixA/mem_reg[10][5]/CK (DFF_X1)
+                                                          0.00       1.00 r
   library setup time                                     -0.03       0.97
   data required time                                                 0.97
   --------------------------------------------------------------------------
   data required time                                                 0.97
-  data arrival time                                                 -1.09
+  data arrival time                                                 -1.15
   --------------------------------------------------------------------------
-  slack (VIOLATED)                                                  -0.12
+  slack (VIOLATED)                                                  -0.19
 
 
 1
@@ -846,7 +889,7 @@ Report : timing
         -max_paths 1
 Design : MMM
 Version: U-2022.12-SP7-2
-Date   : Wed Dec 11 14:49:49 2024
+Date   : Wed Dec 11 18:20:25 2024
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -857,13 +900,13 @@ No loops.
 
 1
 date
-Wed Dec 11 14:49:49 2024
+Wed Dec 11 18:20:25 2024
 # write -f verilog $TOP_MOD_NAME -output gates.v -hierarchy
 quit
 
-Memory usage for this session 204 Mbytes.
-Memory usage for this session including child processes 215 Mbytes.
-CPU usage for this session 94 seconds ( 0.03 hours ).
-Elapsed time for this session 96 seconds ( 0.03 hours ).
+Memory usage for this session 209 Mbytes.
+Memory usage for this session including child processes 380 Mbytes.
+CPU usage for this session 59 seconds ( 0.02 hours ).
+Elapsed time for this session 61 seconds ( 0.02 hours ).
 
 Thank you...
